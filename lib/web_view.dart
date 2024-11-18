@@ -1,60 +1,25 @@
-import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:file_picker/file_picker.dart';
-
-class WebViewFileUploadPage extends StatefulWidget {
+class InAppWebViewFileUploadPage extends StatefulWidget {
   @override
-  _WebViewFileUploadPageState createState() => _WebViewFileUploadPageState();
+  _InAppWebViewFileUploadPageState createState() =>
+      _InAppWebViewFileUploadPageState();
 }
 
-class _WebViewFileUploadPageState extends State<WebViewFileUploadPage> {
-  late final WebViewController _controller;
+class _InAppWebViewFileUploadPageState
+    extends State<InAppWebViewFileUploadPage> {
+  late InAppWebViewController _webViewController;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize the WebViewController
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            debugPrint('Page started loading: $url');
-          },
-          onPageFinished: (String url) {
-            debugPrint('Page finished loading: $url');
-          },
-          onNavigationRequest: (NavigationRequest request) async {
-            // Handle custom URL schemes for file uploads
-            if (request.url.startsWith('fileupload://')) {
-              await _handleFileUploadRequest(request.url);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse('https://joyuful.com'));
-  }
-
-  Future<void> _handleFileUploadRequest(String url) async {
-    // Open file picker to select a file
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result != null) {
-      File file = File(result.files.single.path!);
-
-      // Upload file via WebView
-      final String fileBase64 = base64Encode(file.readAsBytesSync());
-      final String jsScript =
-          "document.querySelector('input[type=file]').files[0] = new File([new Uint8Array(atob('$fileBase64').split('').map(c => c.charCodeAt(0)))], '${file.path.split('/').last}');";
-      await _controller.runJavaScript(jsScript);
-    } else {
-      // User canceled the file picker
+    if (Platform.isAndroid) {
+      // Enable debugging for Android
+      InAppWebViewController.setWebContentsDebuggingEnabled(true);
     }
   }
 
@@ -62,9 +27,37 @@ class _WebViewFileUploadPageState extends State<WebViewFileUploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("WebView File Upload"),
+        title: Text("InAppWebView File Upload"),
       ),
-      body: WebViewWidget(controller: _controller),
+      body: InAppWebView(
+        initialUrlRequest: URLRequest(
+          url: WebUri("https://joyuful.com"),
+        ),
+        onWebViewCreated: (controller) {
+          _webViewController = controller;
+        },
+        onLoadStop: (controller, url) {
+          print("Page loaded: $url");
+        },
+        shouldOverrideUrlLoading: (controller, navigationAction) async {
+          // Intercept file upload requests here
+          if (navigationAction.request.url?.scheme == "fileupload") {
+            await _handleFileUpload();
+            return NavigationActionPolicy.CANCEL;
+          }
+          return NavigationActionPolicy.ALLOW;
+        },
+      ),
     );
+  }
+
+  Future<void> _handleFileUpload() async {
+    // Use FilePicker to select files
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      File file = File(result.files.single.path!);
+      // Process the selected file if necessary
+      print("Selected file: ${file.path}");
+    }
   }
 }
