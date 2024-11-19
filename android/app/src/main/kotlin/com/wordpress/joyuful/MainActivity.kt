@@ -1,4 +1,4 @@
-package com.example.wordpress
+package com.wordpress.joyuful
 
 import io.flutter.embedding.android.FlutterActivity
 

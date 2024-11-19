@@ -3,6 +3,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 
+import 'package:wordpress/colors.dart';
+
 class InAppWebViewFileUploadPage extends StatefulWidget {
   @override
   _InAppWebViewFileUploadPageState createState() =>
@@ -27,7 +29,9 @@ class _InAppWebViewFileUploadPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("InAppWebView File Upload"),
+        //title: Text("InAppWebView File Upload"),
+        backgroundColor: ColorPalette.primaryColor,
+        automaticallyImplyLeading: false,
       ),
       body: InAppWebView(
         initialUrlRequest: URLRequest(
