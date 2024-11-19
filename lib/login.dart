@@ -89,12 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return "Please enter your email/username.";
                     }
-                    bool isEmail = RegExp(
-                            r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
-                        .hasMatch(value);
+                    bool isEmail = RegExp(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$").hasMatch(value);
 
-                    bool isUsername =
-                        RegExp(r"^[a-zA-Z0-9_]+$").hasMatch(value);
+                    bool isUsername = RegExp(r"^[a-zA-Z0-9_]+$").hasMatch(value);
 
                     if (!isEmail && !isUsername) {
                       return "Enter a valid email or username.";
