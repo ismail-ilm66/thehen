@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'login.dart';
+import 'screens/login.dart';
 import 'colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -39,8 +39,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   image: Icons.rocket_launch_outlined,
                   widget: ElevatedButton.icon(
                     onPressed: () {
-                      Get.offAll(()=>LoginScreen());
-                     /* Navigator.push(
+                      Get.offAll(() => LoginScreen());
+                      /* Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => LoginScreen()),
                       );*/
@@ -55,8 +55,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorPalette.blackColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
                   ),
                 ),
@@ -120,7 +122,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           SizedBox(height: 50),
           if (widget != null) widget,
-
         ],
       ),
     );
