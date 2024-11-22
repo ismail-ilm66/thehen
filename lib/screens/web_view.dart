@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:wordpress/colors.dart';
 
 class InAppWebViewFileUploadPage extends StatefulWidget {
+  const InAppWebViewFileUploadPage({super.key});
+
   @override
   _InAppWebViewFileUploadPageState createState() =>
       _InAppWebViewFileUploadPageState();
@@ -35,7 +37,7 @@ class _InAppWebViewFileUploadPageState
       ),
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: WebUri("https://joyuful.com"),
+          url: WebUri("https://joyuful.com/entry/"),
         ),
         onWebViewCreated: (controller) {
           _webViewController = controller;

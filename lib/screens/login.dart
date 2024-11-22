@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:wordpress/controllers/auth_controllers.dart';
 import '../colors.dart';
@@ -38,91 +39,89 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 40),
-                Obx(() => TextFormField(
-                      onChanged: (value) =>
-                          _authController.username.value = value,
-                      decoration: InputDecoration(
-                        hintText: "Email / Username",
-                        prefixIcon: const Icon(Icons.email_outlined,
-                            color: ColorPalette.blackColor),
-                        filled: true,
-                        fillColor: ColorPalette.whiteColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18, horizontal: 16),
-                        hintStyle: TextStyle(
-                            color: ColorPalette.blackColor.withOpacity(0.5)),
+                TextFormField(
+                  onChanged: (value) => _authController.username.value = value,
+                  decoration: InputDecoration(
+                    hintText: "Email / Username",
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        color: ColorPalette.blackColor),
+                    filled: true,
+                    fillColor: ColorPalette.whiteColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16),
+                    hintStyle: TextStyle(
+                        color: ColorPalette.blackColor.withOpacity(0.5)),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your email/username.";
+                    }
+                    bool isEmail = RegExp(
+                            r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+                        .hasMatch(value);
+
+                    bool isUsername =
+                        RegExp(r"^[a-zA-Z0-9_]+$").hasMatch(value);
+
+                    if (!isEmail && !isUsername) {
+                      return "Enter a valid email or username.";
+                    }
+
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20.h),
+                TextFormField(
+                  onChanged: (value) => _authController.password.value = value,
+                  obscureText: _authController.obsecurePassword.value,
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    prefixIcon: const Icon(Icons.lock_outline,
+                        color: ColorPalette.blackColor),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _authController.obsecurePassword.value
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: ColorPalette.blackColor,
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter your email/username.";
-                        }
-                        bool isEmail = RegExp(
-                                r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
-                            .hasMatch(value);
-
-                        bool isUsername =
-                            RegExp(r"^[a-zA-Z0-9_]+$").hasMatch(value);
-
-                        if (!isEmail && !isUsername) {
-                          return "Enter a valid email or username.";
-                        }
-
-                        return null;
+                      onPressed: () {
+                        _authController.obsecurePassword.value =
+                            !_authController.obsecurePassword.value;
                       },
-                    )),
-                const SizedBox(height: 20),
-                Obx(() => TextFormField(
-                      onChanged: (value) =>
-                          _authController.password.value = value,
-                      obscureText: _authController.obsecurePassword.value,
-                      decoration: InputDecoration(
-                        hintText: "Password",
-                        prefixIcon: const Icon(Icons.lock_outline,
-                            color: ColorPalette.blackColor),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _authController.obsecurePassword.value
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: ColorPalette.blackColor,
-                          ),
-                          onPressed: () {
-                            _authController.obsecurePassword.value =
-                                !_authController.obsecurePassword.value;
-                          },
-                        ),
-                        filled: true,
-                        fillColor: ColorPalette.whiteColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18, horizontal: 16),
-                        hintStyle: TextStyle(
-                            color: ColorPalette.blackColor.withOpacity(0.5)),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter your password.";
-                        }
-                        if (value.length < 6) {
-                          return "Password must be at least 6 characters long.";
-                        }
-                        return null;
-                      },
-                    )),
-                const SizedBox(height: 30),
+                    ),
+                    filled: true,
+                    fillColor: ColorPalette.whiteColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16),
+                    hintStyle: TextStyle(
+                        color: ColorPalette.blackColor.withOpacity(0.5)),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your password.";
+                    }
+                    if (value.length < 6) {
+                      return "Password must be at least 6 characters long.";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 30.h),
                 Obx(() => ElevatedButton(
                       onPressed: _authController.isLoading.value
                           ? null
-                          : () {
+                          : () async {
                               if (_formKey.currentState!.validate()) {
-                                _authController.login();
+                                await _authController.login();
                               }
                             },
                       style: ElevatedButton.styleFrom(

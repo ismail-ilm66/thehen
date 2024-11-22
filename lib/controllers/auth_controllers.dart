@@ -4,6 +4,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:wordpress/models/login_model.dart';
+import 'package:wordpress/screens/auto_login.dart';
+import 'package:wordpress/screens/web_view_screen.dart';
 
 class AuthController extends GetxController {
   final username = ''.obs;
@@ -64,11 +66,16 @@ class AuthController extends GetxController {
       );
 
       final responseData = json.decode(response.body);
+      print('This is the response of the login api: $responseData');
 // Parse response
       tokenResponse.value = TokenResponse.fromJson(responseData);
 
       if (tokenResponse.value?.token != null) {
         // Success response
+        // Get.to(() => WebViewScreen(token: tokenResponse.value!.token!));
+        Get.to(() =>
+            AutoLoginPage(email: username.value, password: password.value));
+
         Get.snackbar(
             "Success", "Welcome, ${tokenResponse.value!.userDisplayName}");
       } else {

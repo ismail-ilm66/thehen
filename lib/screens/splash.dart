@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'colors.dart';
+import '../colors.dart';
 import 'onboardings.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,7 +14,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 3), () {
-
       Get.offAll(() => OnboardingScreen());
     });
   }
