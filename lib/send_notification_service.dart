@@ -5,7 +5,7 @@ import 'package:wordpress/service_account_service.dart';
 Future<void> sendNotification(String token, String title, String body) async {
 
 
-  const String fcmUrl = 'https://fcm.googleapis.com/v1/projects/wordpress-3d152/messages:send';
+  const String fcmUrl = 'https://fcm.googleapis.com/v1/projects/joyufulapp/messages:send';
 
   final String accessToken = await getAccessToken();
 
