@@ -1,7 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:wordpress/controllers/internet_controller.dart';
 import 'package:wordpress/firebase_options.dart';
 import 'package:wordpress/screens/splash.dart';
 
@@ -18,6 +21,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get.put(ConnectivityController());
+    Get.put(InternetController(), permanent: true);
+
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,

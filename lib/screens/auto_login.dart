@@ -34,14 +34,28 @@ class AutoLoginPage extends StatelessWidget {
               javaScriptEnabled: true, // Enable JavaScript
               domStorageEnabled:
                   true, // Enable DOM storage for form interactions
+              useShouldOverrideUrlLoading: true,
             ),
+            shouldOverrideUrlLoading:
+                (controller, shouldOverrideUrlLoadingRequest) async {
+              print(
+                  'This is the URL: ${shouldOverrideUrlLoadingRequest.request.url}');
+              if (shouldOverrideUrlLoadingRequest.request.url
+                  .toString()
+                  .contains('https://joyuful.com/wp-login.php?action=logout')) {
+                Navigator.pop(context);
+                Get.snackbar('Logged Out', 'You have been logged out');
+              }
+              return NavigationActionPolicy.ALLOW;
+            },
             onWebViewCreated: (controller) {
               // Handle WebView controller creation if needed
             },
             onLoadStop: (controller, url) async {
               print("Page loaded: $url");
 
-              if (url.toString().contains("wp-login.php")) {
+              if (url.toString().contains("wp-login.php") ||
+                  url.toString().contains("https://joyuful.com/login/")) {
                 // Inject JavaScript to fill the form and submit it
                 await controller.evaluateJavascript(source: """
                   (function() {
@@ -66,13 +80,13 @@ class AutoLoginPage extends StatelessWidget {
                 } else {
                   webViewController.setLoading(false);
                 }
-              }
+              } else {}
             },
           ),
           Obx(() {
             // Observe loading state
             if (webViewController.isLoading.value) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(), // Show loader when loading
               );
             } else {
@@ -82,5 +96,18 @@ class AutoLoginPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<int?> countCookies(Uri? url) async {
+    if (url != null) {
+      final cookies = await CookieManager.instance()
+          .getCookies(url: WebUri(url.toString()));
+      print("Number of cookies for ${url.toString()}: ${cookies.length}");
+      for (var cookie in cookies) {
+        print("Cookie: ${cookie.name} = ${cookie.value}");
+      }
+      return cookies.length;
+    }
+    return null;
   }
 }
