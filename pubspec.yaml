@@ -40,6 +40,7 @@ dependencies:
   cloud_firestore: ^5.5.0
   firebase_messaging: ^15.1.5
   flutter_local_notifications: ^18.0.1
+  googleapis_auth: ^1.6.0
   cupertino_icons: ^1.0.8
   file_picker: ^8.1.4
 

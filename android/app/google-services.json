@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "137073028855",
-    "project_id": "wordpress-3d152",
-    "storage_bucket": "wordpress-3d152.firebasestorage.app"
+    "project_number": "46106613533",
+    "project_id": "joyufulapp",
+    "storage_bucket": "joyufulapp.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:137073028855:android:d2fd7a716c50e58ee62df2",
+        "mobilesdk_app_id": "1:46106613533:android:31aa3ba4a87f3ed3aeb3f4",
         "android_client_info": {
           "package_name": "com.wordpress.joyuful"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDARX1qAPz0uXOSJRFQQZzpUI-wKTV4UOA"
+          "current_key": "AIzaSyC1G12_mkI9XvHpFFo-6jLrHhGi4hySr3A"
         }
       ],
       "services": {

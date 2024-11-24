@@ -5,11 +5,19 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:wordpress/firebase_options.dart';
 import 'package:wordpress/screens/splash.dart';
 
-void main() async {
+import 'colors.dart';
+import 'notification_service.dart';
+
+
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final NotificationService notificationService = NotificationService();
+  await notificationService.initialize();
+
   runApp(const MyApp());
 }
 

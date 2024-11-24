@@ -41,7 +41,8 @@ class AutoLoginPage extends StatelessWidget {
             onLoadStop: (controller, url) async {
               print("Page loaded: $url");
 
-              if (url.toString().contains("wp-login.php")) {
+              if (url.toString().contains("wp-login.php")|| url.toString().contains("https://joyuful.com/login/")){
+
                 // Inject JavaScript to fill the form and submit it
                 await controller.evaluateJavascript(source: """
                   (function() {
@@ -73,7 +74,7 @@ class AutoLoginPage extends StatelessWidget {
             // Observe loading state
             if (webViewController.isLoading.value) {
               return Center(
-                child: CircularProgressIndicator(), // Show loader when loading
+                child: CircularProgressIndicator(color: ColorPalette.primaryColor,), // Show loader when loading
               );
             } else {
               return const SizedBox.shrink(); // Hide loader when not loading
