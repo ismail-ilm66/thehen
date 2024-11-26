@@ -7,11 +7,13 @@ import 'package:wordpress/controllers/web_controller.dart';
 class AutoLoginPage extends StatelessWidget {
   final String email; // User email for login
   final String password; // User password for login
+  final String? otherUrl;
 
   AutoLoginPage({
     super.key,
     required this.email,
     required this.password,
+    this.otherUrl,
   });
 
   final WebViewController webViewController =
@@ -28,7 +30,7 @@ class AutoLoginPage extends StatelessWidget {
         children: [
           InAppWebView(
             initialUrlRequest: URLRequest(
-              url: WebUri("https://joyuful.com/login/"),
+              url: WebUri(otherUrl ?? "https://joyuful.com/login/"),
             ),
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true, // Enable JavaScript

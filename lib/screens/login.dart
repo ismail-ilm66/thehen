@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:wordpress/controllers/auth_controllers.dart';
+import 'package:wordpress/screens/auto_login.dart';
 import '../colors.dart';
-import '../user_homescreen.dart';
+import 'user_homescreen.dart';
 
 class LoginScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -148,9 +149,11 @@ class LoginScreen extends StatelessWidget {
                             ),
                     )),
                 const SizedBox(height: 20),
-                ElevatedButton(onPressed: (){
-                  Get.to(()=> HomeScreen());
-                }, child: Text("Home testing")),
+                ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => HomeScreen());
+                    },
+                    child: const Text("Home testing")),
               ],
             ),
           ),
