@@ -149,11 +149,11 @@ class LoginScreen extends StatelessWidget {
                             ),
                     )),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => HomeScreen());
-                    },
-                    child: const Text("Home testing")),
+                // ElevatedButton(
+                //     onPressed: () {
+                //       Get.to(() => HomeScreen());
+                //     },
+                //     child: const Text("Home testing")),
               ],
             ),
           ),

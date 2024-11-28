@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:wordpress/colors.dart';
 import 'package:wordpress/controllers/settings_controller.dart';
+import 'package:wordpress/helpers/shared_preferences_helper.dart';
+import 'package:wordpress/screens/auto_login.dart';
+import 'package:wordpress/screens/login.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String name;
+  final String email;
+  final String password;
+  final bool fromSignIn;
+  const HomeScreen({
+    super.key,
+    required this.name,
+    required this.email,
+    required this.password,
+    this.fromSignIn = false,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -15,14 +29,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController(viewportFraction: 0.85);
   final SettingsController settingsController = SettingsController();
+  String name = '';
+  late InAppWebViewController _webViewController;
+  var currentUrl = "https://joyuful.com/login/".obs;
 
   int _currentPage = 0;
-
-  final List<String> sliderImages = [
-    'https://res.cloudinary.com/dm7uq1adt/image/upload/v1732168773/du29n0aligtxzqsz8mzv.png',
-    'https://res.cloudinary.com/dm7uq1adt/image/upload/v1732168773/du29n0aligtxzqsz8mzv.png',
-    'https://res.cloudinary.com/dm7uq1adt/image/upload/v1732168773/du29n0aligtxzqsz8mzv.png'
-  ];
 
   @override
   void initState() {
@@ -32,6 +43,32 @@ class _HomeScreenState extends State<HomeScreen> {
         'This is the length of the navbar items: ${settingsController.navbarItems.length}');
     settingsController.fetchNavbarItems();
     settingsController.fetchHeroItems();
+
+    Future.delayed(const Duration(seconds: 1), () {
+      Get.to(
+        () => AutoLoginPage(
+          email: widget.email,
+          password: widget.password,
+          firstTime: true,
+        ),
+      );
+    }).then((value) {
+      if (widget.fromSignIn) {
+        Get.snackbar('Welcome', 'Welcome $name');
+      }
+    });
+    if (widget.name == 'No name') {
+      name = widget.email;
+    } else {
+      name = widget.name;
+    }
+  }
+
+  void _loadUrl(String url) {
+    currentUrl.value = url;
+    _webViewController.loadUrl(
+      urlRequest: URLRequest(url: WebUri(url)),
+    );
   }
 
   @override
@@ -40,8 +77,27 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("Home Screen"),
+        title: Text("Welcome $name"),
         backgroundColor: const Color(0xFFffc200),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await SharedPreferencesHelper.clearAll();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(),
+                ),
+                (route) => false,
+              );
+              Get.snackbar('Logged Out', 'You have been logged out');
+            },
+            icon: const Icon(
+              Icons.logout_outlined,
+              color: Colors.black,
+            ),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -51,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 () {
                   if (settingsController.loadingHeroItems.value) {
                     return SizedBox(
-                      height: 250.h,
+                      height: 80.h,
                       child: const Center(
                         child: CircularProgressIndicator(
                           color: ColorPalette.primaryColor,
@@ -61,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   if (settingsController.heroItems.isEmpty) {
                     return SizedBox(
-                      height: 250.h,
+                      height: 80.h,
                       child: const Center(
                         child: Text("No hero items found"),
                       ),
@@ -69,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   return SizedBox(
-                    height: 250.h,
+                    height: 140.h,
                     child: PageView.builder(
                       controller: _pageController,
                       itemCount: settingsController.heroItems.length,
@@ -99,7 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             onTap: () {},
                             child: Container(
                               margin: EdgeInsets.symmetric(
-                                  horizontal: 16.w, vertical: 8.h),
+                                      horizontal: 16.w, vertical: 8.h)
+                                  .copyWith(bottom: 0),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),
                                 image: DecorationImage(
@@ -118,8 +175,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          const SizedBox(height: 16),
+          SizedBox(height: 2.h),
+
           // Slider Indicator
           SmoothPageIndicator(
             controller: _pageController,
@@ -132,7 +189,76 @@ class _HomeScreenState extends State<HomeScreen> {
               expansionFactor: 3,
             ),
           ),
-          const Spacer(),
+          Expanded(
+            child: Obx(
+              () => InAppWebView(
+                initialUrlRequest: URLRequest(
+                  url: WebUri(currentUrl.value),
+                ),
+                initialSettings: InAppWebViewSettings(
+                  javaScriptEnabled: true,
+                  domStorageEnabled: true,
+                  useShouldOverrideUrlLoading: true,
+                ),
+                shouldOverrideUrlLoading:
+                    (controller, shouldOverrideUrlLoadingRequest) async {
+                  print(
+                      'This is the URL: ${shouldOverrideUrlLoadingRequest.request.url}');
+                  if (shouldOverrideUrlLoadingRequest.request.url
+                      .toString()
+                      .contains(
+                          'https://joyuful.com/wp-login.php?action=logout')) {
+                    await SharedPreferencesHelper.clearAll();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                      (route) => false,
+                    );
+
+                    // Navigator.pop
+                    Get.snackbar('Logged Out', 'You have been logged out');
+                  }
+
+                  return NavigationActionPolicy.ALLOW;
+                },
+                onWebViewCreated: (controller) {
+                  _webViewController = controller;
+                  // Handle WebView controller creation if needed
+                },
+                onLoadStop: (controller, url) async {
+                  print("Page loaded: $url");
+
+                  if (url.toString().contains("wp-login.php") ||
+                      url.toString().contains("https://joyuful.com/login/")) {
+                    await controller.evaluateJavascript(source: """
+                (function() {
+                  // Check if the username field exists
+                  var usernameField = document.getElementById('user_login0');
+                  if (usernameField) {
+                    usernameField.value = '${widget.email}'; // Set email
+                  }
+              
+                  // Check if the password field exists
+                  var passwordField = document.getElementById('user_pass0');
+                  if (passwordField) {
+                    passwordField.value = '${widget.password}'; // Set password
+                  }
+              
+                  // Check if the submit button exists and click it
+                  var submitButton = document.getElementById('wp-submit0');
+                  if (submitButton) {
+                    submitButton.click(); // Click the login button
+                  }
+                })();
+              """);
+                  } else {}
+                },
+                onProgressChanged: (controller, progress) {},
+              ),
+            ),
+          ),
           Obx(() {
             if (settingsController.navBarLoading.value) {
               return const Center(
@@ -152,10 +278,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       return Expanded(
                         flex: 1,
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            _loadUrl(link.destination);
+                            // Get.to(() => AutoLoginPage(
+                            //       email: widget.email,
+                            //       password: widget.password,
+                            //       otherUrl: link.destination,
+                            //     ));
+                          },
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 4.w),
-                            padding: EdgeInsets.all(16.r),
+                            padding: EdgeInsets.all(8.r),
                             decoration: BoxDecoration(
                               color: Color(int.parse(
                                   "0xff${settingsController.navbarBackgroundColor.value}")),
@@ -207,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }),
 
-          SizedBox(height: 16.h),
+          SizedBox(height: 8.h),
         ],
       ),
     );

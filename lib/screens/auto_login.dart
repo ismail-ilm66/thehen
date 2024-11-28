@@ -1,23 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wordpress/colors.dart';
 import 'package:wordpress/controllers/web_controller.dart';
+import 'package:wordpress/helpers/shared_preferences_helper.dart';
+import 'package:wordpress/screens/login.dart';
 
 class AutoLoginPage extends StatelessWidget {
   final String email; // User email for login
   final String password; // User password for login
   final String? otherUrl;
+  final bool firstTime;
 
   AutoLoginPage({
     super.key,
     required this.email,
     required this.password,
     this.otherUrl,
+    this.firstTime = false,
   });
 
   final WebViewController webViewController =
       Get.put(WebViewController()); // Instantiate the controller
+
+  Future<int> getCookiesCountForUrl(String url) async {
+    final cookies = await CookieManager.instance().getCookies(url: WebUri(url));
+    print("Cookies for $url: ${cookies.length}");
+    return cookies.length;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +44,8 @@ class AutoLoginPage extends StatelessWidget {
               url: WebUri(otherUrl ?? "https://joyuful.com/login/"),
             ),
             initialSettings: InAppWebViewSettings(
-              javaScriptEnabled: true, // Enable JavaScript
-              domStorageEnabled:
-                  true, // Enable DOM storage for form interactions
+              javaScriptEnabled: true,
+              domStorageEnabled: true,
               useShouldOverrideUrlLoading: true,
             ),
             shouldOverrideUrlLoading:
@@ -45,8 +55,24 @@ class AutoLoginPage extends StatelessWidget {
               if (shouldOverrideUrlLoadingRequest.request.url
                   .toString()
                   .contains('https://joyuful.com/wp-login.php?action=logout')) {
-                Navigator.pop(context);
+                await SharedPreferencesHelper.clearAll();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                  (route) => false,
+                );
+
+                // Navigator.pop
                 Get.snackbar('Logged Out', 'You have been logged out');
+              }
+              if (firstTime) {
+                if (shouldOverrideUrlLoadingRequest.request.url
+                    .toString()
+                    .contains("https://joyuful.com/entry/")) {
+                  Navigator.pop(context);
+                }
               }
               return NavigationActionPolicy.ALLOW;
             },
@@ -59,16 +85,40 @@ class AutoLoginPage extends StatelessWidget {
               if (url.toString().contains("wp-login.php") ||
                   url.toString().contains("https://joyuful.com/login/")) {
                 // Inject JavaScript to fill the form and submit it
-                await controller.evaluateJavascript(source: """
-                  (function() {
-                    // Fill the username and password fields
-                    document.getElementById('user_login0').value = '$email'; // Set email
-                    document.getElementById('user_pass0').value = '$password'; // Set password
+                // await controller.evaluateJavascript(source: """
+                //   (function() {
+                //     // Fill the username and password fields
+                //     document.getElementById('user_login0').value = '$email'; // Set email
+                //     document.getElementById('user_pass0').value = '$password'; // Set password
 
-                    // Automatically submit the form
-                    document.getElementById('wp-submit0').click(); // Click the login button
-                  })();
-                """);
+                //     // Automatically submit the form
+                //     document.getElementById('wp-submit0').click(); // Click the login button
+                //   })();
+                // """);
+                await controller.evaluateJavascript(source: """
+  (function() {
+    // Check if the username field exists
+    var usernameField = document.getElementById('user_login0');
+    if (usernameField) {
+      usernameField.value = '$email'; // Set email
+    }
+
+    // Check if the password field exists
+    var passwordField = document.getElementById('user_pass0');
+    if (passwordField) {
+      passwordField.value = '$password'; // Set password
+    }
+
+    // Check if the submit button exists and click it
+    var submitButton = document.getElementById('wp-submit0');
+    if (submitButton) {
+      submitButton.click(); // Click the login button
+    }
+  })();
+""");
+                Future.delayed(Duration(seconds: 5), () {
+                  Navigator.pop(context);
+                });
               } else {
                 // If the next page has loaded, hide the loader
                 webViewController.setLoading(false);
@@ -85,16 +135,27 @@ class AutoLoginPage extends StatelessWidget {
               } else {}
             },
           ),
-          Obx(() {
-            // Observe loading state
-            if (webViewController.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(), // Show loader when loading
-              );
-            } else {
-              return const SizedBox.shrink(); // Hide loader when not loading
-            }
-          }),
+          if (firstTime)
+            SizedBox.expand(
+              child: Container(
+                color: ColorPalette.whiteColor,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: ColorPalette.primaryColor,
+                  ),
+                ),
+              ),
+            ),
+          // Obx(() {
+          //   // Observe loading state
+          //   if (webViewController.isLoading.value) {
+          //     return const Center(
+          //       child: CircularProgressIndicator(), // Show loader when loading
+          //     );
+          //   } else {
+          //     return const SizedBox.shrink(); // Hide loader when not loading
+          //   }
+          // }),
         ],
       ),
     );

@@ -5,8 +5,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/models/login_model.dart';
 import 'package:wordpress/screens/auto_login.dart';
+import 'package:wordpress/screens/user_homescreen.dart';
 
 import '../admin_dashboard.dart';
 import '../colors.dart';
@@ -14,6 +17,7 @@ import '../colors.dart';
 class AuthController extends GetxController {
   final username = ''.obs;
   final password = ''.obs;
+  final name = ''.obs;
   final device = ''.obs;
   final isLoading = false.obs;
   final obsecurePassword = false.obs;
@@ -102,9 +106,20 @@ class AuthController extends GetxController {
           // Success response
           // Get.to(() => WebViewScreen(token: tokenResponse.value!.token!));
           await saveTokenToFirestore(username.value);
-          Get.to(() =>
-              AutoLoginPage(email: username.value, password: password.value));
-
+          name.value = tokenResponse.value!.userDisplayName ?? 'No name';
+          await SharedPreferencesHelper.setEmail(username.value);
+          await SharedPreferencesHelper.setPassword(password.value);
+          await SharedPreferencesHelper.setName(name.value);
+          // Get.to(() =>
+          //     AutoLoginPage(email: username.value, password: password.value));
+          Get.offAll(
+            () => HomeScreen(
+              name: name.value,
+              email: username.value,
+              password: password.value,
+              fromSignIn: true,
+            ),
+          );
           Get.snackbar(
               "Success", "Welcome, ${tokenResponse.value!.userDisplayName}");
         } else {
