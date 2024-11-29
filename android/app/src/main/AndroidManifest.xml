@@ -14,7 +14,7 @@
         tools:ignore="ScopedStorage" />
 
     <application
-        android:label="wordpress"
+        android:label="Joyuful"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"

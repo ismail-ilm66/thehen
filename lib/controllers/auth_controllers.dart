@@ -5,10 +5,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wordpress/controllers/settings_controller.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/models/login_model.dart';
-import 'package:wordpress/screens/auto_login.dart';
 import 'package:wordpress/screens/user_homescreen.dart';
 
 import '../admin_dashboard.dart';
@@ -20,12 +19,13 @@ class AuthController extends GetxController {
   final name = ''.obs;
   final device = ''.obs;
   final isLoading = false.obs;
-  final obsecurePassword = false.obs;
+  final obsecurePassword = true.obs;
 
   final tokenResponse = Rxn<TokenResponse>();
   final errorMessage = ''.obs;
 
   final String apiUrl = "https://joyuful.com/wp-json/jwt-auth/v1/token";
+  final SettingsController settingsController = Get.find();
 
   void _showSnackbar(
       String message, Color backgroundColor, BuildContext context) {
@@ -126,7 +126,8 @@ class AuthController extends GetxController {
           // Error response
           errorMessage.value =
               tokenResponse.value?.errorMessage ?? "Login failed";
-          Get.snackbar("Error", errorMessage.value);
+          Get.snackbar(settingsController.signinErrorTitle.value,
+              settingsController.signinErrorText.value);
         }
       } catch (e) {
         errorMessage.value = "An unexpected error occurred: $e";

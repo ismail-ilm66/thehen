@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:wordpress/controllers/auth_controllers.dart';
+import 'package:wordpress/controllers/settings_controller.dart';
 import 'package:wordpress/screens/auto_login.dart';
 import '../colors.dart';
-import 'user_homescreen.dart';
 
 class LoginScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _authController = Get.put(AuthController());
+  final SettingsController settingsController = Get.find();
 
   LoginScreen({super.key});
 
@@ -77,77 +78,110 @@ class LoginScreen extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 20.h),
-                TextFormField(
-                  onChanged: (value) => _authController.password.value = value,
-                  obscureText: _authController.obsecurePassword.value,
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                    prefixIcon: const Icon(Icons.lock_outline,
-                        color: ColorPalette.blackColor),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _authController.obsecurePassword.value
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: ColorPalette.blackColor,
+                Obx(
+                  () => TextFormField(
+                    onChanged: (value) =>
+                        _authController.password.value = value,
+                    obscureText: _authController.obsecurePassword.value,
+                    decoration: InputDecoration(
+                      hintText: "Password",
+                      prefixIcon: const Icon(Icons.lock_outline,
+                          color: ColorPalette.blackColor),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _authController.obsecurePassword.value
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: ColorPalette.blackColor,
+                        ),
+                        onPressed: () {
+                          print('This is the value');
+                          _authController.obsecurePassword.value =
+                              !_authController.obsecurePassword.value;
+                        },
                       ),
-                      onPressed: () {
-                        _authController.obsecurePassword.value =
-                            !_authController.obsecurePassword.value;
-                      },
+                      filled: true,
+                      fillColor: ColorPalette.whiteColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18, horizontal: 16),
+                      hintStyle: TextStyle(
+                          color: ColorPalette.blackColor.withOpacity(0.5)),
                     ),
-                    filled: true,
-                    fillColor: ColorPalette.whiteColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 18, horizontal: 16),
-                    hintStyle: TextStyle(
-                        color: ColorPalette.blackColor.withOpacity(0.5)),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter your password.";
+                      }
+                      if (value.length < 6) {
+                        return "Password must be at least 6 characters long.";
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter your password.";
-                    }
-                    if (value.length < 6) {
-                      return "Password must be at least 6 characters long.";
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: 30.h),
-                Obx(() => ElevatedButton(
-                      onPressed: _authController.isLoading.value
-                          ? null
-                          : () async {
-                              if (_formKey.currentState!.validate()) {
-                                await _authController.login();
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorPalette.blackColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 120),
-                        elevation: 6,
+                Obx(
+                  () => ElevatedButton(
+                    onPressed: _authController.isLoading.value
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              await _authController.login();
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(int.parse(
+                          '0xff${settingsController.signinButtonBackground.value}')),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      child: _authController.isLoading.value
-                          ? const CircularProgressIndicator(
-                              color: ColorPalette.whiteColor,
-                            )
-                          : const Text(
-                              "Login",
-                              style: TextStyle(
-                                color: ColorPalette.whiteColor,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 32),
+                      elevation: 6,
+                    ),
+                    child: _authController.isLoading.value
+                        ? const CircularProgressIndicator(
+                            color: ColorPalette.primaryColor,
+                          )
+                        : Text(
+                            settingsController.signinButtonText.value,
+                            style: TextStyle(
+                              color: Color(int.parse(
+                                  '0xff${settingsController.signinButtonTextColor.value}')),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                    )),
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      AutoLoginPage(
+                        email: 'email',
+                        password: 'password',
+                        otherUrl: settingsController
+                            .registerItems.first.registerDestination,
+                        firstTime: false,
+                      ),
+                    );
+                  },
+                  child: Text(
+                    settingsController.registerItems.first.registerText,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: ColorPalette.blackColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 20),
                 // ElevatedButton(
                 //     onPressed: () {

@@ -15,7 +15,7 @@ class HeroItem {
     return HeroItem(
       enabled: data['_enabled'] ?? false,
       order: int.tryParse(data['_order'] ?? '0') ?? 0,
-      destination: data['hero_destination'] ?? '#',
+      destination: data['hero_destination'] ?? 'www.google.com',
       source: data['hero_source'] ?? '',
     );
   }

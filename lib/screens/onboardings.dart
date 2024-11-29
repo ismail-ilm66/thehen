@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:wordpress/controllers/settings_controller.dart';
 import 'login.dart';
 import '../colors.dart';
 
@@ -11,7 +12,53 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  List<Widget> wid = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    wid = [
+      buildOnboardPage(
+        title: "Welcome to Joyful",
+        description: "Experience happiness in a minimalistic way.",
+        image:
+            'https://www.iconpacks.net/icons/2/free-rocket-icon-3430-thumb.png',
+      ),
+      buildOnboardPage(
+        title: "Stay Organized",
+        description: "Everything you need at your fingertips.",
+        image:
+            'https://www.iconpacks.net/icons/2/free-rocket-icon-3430-thumb.png',
+      ),
+      buildOnboardPage(
+        title: "Get Started Now",
+        description: "Your journey to happiness begins here.",
+        image:
+            'https://www.iconpacks.net/icons/2/free-rocket-icon-3430-thumb.png',
+        widget: ElevatedButton.icon(
+          onPressed: () {
+            Get.offAll(() => LoginScreen());
+          },
+          icon: const Icon(Icons.arrow_forward, color: ColorPalette.whiteColor),
+          label: const Text(
+            "Get Started",
+            style: TextStyle(
+                color: ColorPalette.whiteColor, fontWeight: FontWeight.bold),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ColorPalette.blackColor,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          ),
+        ),
+      ),
+    ];
+  }
+
   final PageController _controller = PageController();
+  final SettingsController settingsController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -22,55 +69,58 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             child: PageView(
               controller: _controller,
-              children: [
-                _buildOnboardPage(
-                  title: "Welcome to Joyful",
-                  description: "Experience happiness in a minimalistic way.",
-                  image: Icons.emoji_emotions_outlined,
-                ),
-                _buildOnboardPage(
-                  title: "Stay Organized",
-                  description: "Everything you need at your fingertips.",
-                  image: Icons.dashboard_customize_outlined,
-                ),
-                _buildOnboardPage(
-                  title: "Get Started Now",
-                  description: "Your journey to happiness begins here.",
-                  image: Icons.rocket_launch_outlined,
-                  widget: ElevatedButton.icon(
-                    onPressed: () {
-                      Get.offAll(() => LoginScreen());
-                      /* Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
-                      );*/
-                    },
-                    icon: Icon(Icons.arrow_forward,
-                        color: ColorPalette.whiteColor),
-                    label: Text(
-                      "Get Started",
-                      style: TextStyle(
-                          color: ColorPalette.whiteColor,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorPalette.blackColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
+              children: settingsController.onboardingItems.isEmpty
+                  ? wid
+                  : settingsController.onboardingItems
+                      .asMap() // Use asMap() to get the index
+                      .map((index, item) => MapEntry(
+                            index,
+                            buildOnboardPage(
+                              title: item.title,
+                              description: item.text,
+                              image: item.icon,
+                              widget: (index ==
+                                          settingsController
+                                                  .onboardingItems.length -
+                                              1 &&
+                                      item.enabled)
+                                  ? ElevatedButton.icon(
+                                      onPressed: () {
+                                        Get.offAll(() => LoginScreen());
+                                      },
+                                      icon: const Icon(Icons.arrow_forward,
+                                          color: ColorPalette.whiteColor),
+                                      label: const Text(
+                                        "Get Started",
+                                        style: TextStyle(
+                                            color: ColorPalette.whiteColor,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            ColorPalette.blackColor,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12)),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 12),
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          ))
+                      .values
+                      .toList(),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: SmoothPageIndicator(
               controller: _controller,
-              count: 3,
-              effect: ExpandingDotsEffect(
+              count: settingsController.onboardingItems.isEmpty
+                  ? wid.length
+                  : settingsController.onboardingItems.length,
+              effect: const ExpandingDotsEffect(
                 activeDotColor: ColorPalette.indicatorActiveColor,
                 dotColor: ColorPalette.indicatorInactiveColor,
                 dotHeight: 8,
@@ -78,16 +128,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  Widget _buildOnboardPage({
+  Widget buildOnboardPage({
     required String title,
     required String description,
-    required IconData image,
+    required String image,
     Widget? widget,
   }) {
     return Padding(
@@ -95,23 +145,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 250),
-          Icon(
+          const SizedBox(height: 250),
+          Image.network(
             image,
-            size: 100,
+            height: 100,
+            width: 100,
             color: ColorPalette.blackColor,
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: ColorPalette.blackColor,
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             description,
             style: TextStyle(
@@ -120,7 +171,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 50),
+          const SizedBox(height: 50),
           if (widget != null) widget,
         ],
       ),

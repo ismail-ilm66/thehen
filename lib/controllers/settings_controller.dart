@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:wordpress/models/hero_model.dart';
 import 'package:wordpress/models/navbar_item_model.dart';
+import 'package:wordpress/models/onboarding_item.dart';
+import 'package:wordpress/models/register_model.dart';
 
 class SettingsController extends GetxController {
+  final RxBool isLoading = true.obs;
   final RxString navbarBackgroundColor = "FFFFFF".obs;
   final RxString navbarIconColor = "000000".obs;
   final RxDouble navbarIconSize = 24.0.obs;
@@ -20,12 +23,35 @@ class SettingsController extends GetxController {
   final RxBool navBarLoading = false.obs;
   final RxBool loadingHeroItems = false.obs;
 
+  //Onboarding Items:
+  final RxList<OnboardingItem> onboardingItems = <OnboardingItem>[].obs;
+  final RxBool loadingOnboardingItems = false.obs;
+
+  //Register Items:
+  RxList<RegisterItem> registerItems = <RegisterItem>[].obs;
+
+  //SignIn Items:
+  final RxString signinButtonBackground = "FFFFFF".obs;
+  final RxString signinButtonText = "Save and Continue".obs;
+  final RxString signinButtonTextColor = "000000".obs;
+  final RxString signinErrorText = "".obs;
+  final RxString signinErrorTitle = "".obs;
+
   @override
   void onInit() {
     super.onInit();
-    fetchNavbarSettings();
-    fetchNavbarItems();
-    fetchHeroItems();
+
+    fetchAllItems();
+  }
+
+  void fetchAllItems() async {
+    await fetchOnboardingItems();
+    await fetchSigninSettings();
+    await fetchSignUpDetails();
+    await fetchNavbarSettings();
+    await fetchNavbarItems();
+    await fetchHeroItems();
+    isLoading.value = false;
   }
 
   Future<void> fetchHeroItems() async {
@@ -107,6 +133,103 @@ class SettingsController extends GetxController {
       }
     } catch (e) {
       print("Error fetching navbar settings: $e");
+    }
+  }
+
+  Future<void> fetchOnboardingItems() async {
+    try {
+      loadingOnboardingItems.value = true;
+      DocumentSnapshot onboardingDoc =
+          await _firestore.collection('app_config').doc('onboarding').get();
+
+      if (onboardingDoc.exists) {
+        Map<String, dynamic> data =
+            onboardingDoc.data() as Map<String, dynamic>;
+        print('This is the data of the onboarding items: $data');
+
+        // Extract items
+        final List<OnboardingItem> items = data.entries.map((entry) {
+          final Map<String, dynamic> itemData =
+              entry.value as Map<String, dynamic>;
+          return OnboardingItem.fromMap(itemData);
+        }).toList();
+
+        // Filter only enabled items and sort by _order
+        onboardingItems.value = items.where((item) => item.enabled).toList()
+          ..sort((a, b) => a.order.compareTo(b.order));
+      } else {
+        print("No onboarding items found in Firestore.");
+      }
+    } catch (e) {
+      print("Error fetching onboarding items: $e");
+    } finally {
+      loadingOnboardingItems.value = false;
+    }
+  }
+
+  Future<void> fetchSignUpDetails() async {
+    try {
+      loadingOnboardingItems.value = true;
+      DocumentSnapshot onboardingDoc =
+          await _firestore.collection('app_config').doc('Registration').get();
+
+      if (onboardingDoc.exists) {
+        Map<String, dynamic> data =
+            onboardingDoc.data() as Map<String, dynamic>;
+        print('This is the data of the signup items: $data');
+        print(data['register_destination']);
+        print(data['register_text']);
+        registerItems.add(RegisterItem(
+            registerDestination: data['register_destination'],
+            registerText: data['register_text']));
+
+        // Extract items
+        // final List<OnboardingItem> items = data.entries.map((entry) {
+        //   final Map<String, dynamic> itemData =
+        //       entry.value as Map<String, dynamic>;
+        //   return OnboardingItem.fromMap(itemData);
+        // }).toList();
+
+        // // Filter only enabled items and sort by _order
+        // onboardingItems.value = items.where((item) => item.enabled).toList()
+        //   ..sort((a, b) => a.order.compareTo(b.order));
+      } else {
+        registerItems.add(RegisterItem(
+            registerDestination: 'https://joyuful.com/registration/',
+            registerText: 'Not registered yet? Click here to register'));
+        print("No signup items found in Firestore.");
+      }
+    } catch (e) {
+      print("Error fetching signup items: $e");
+    } finally {
+      loadingOnboardingItems.value = false;
+    }
+  }
+
+  Future<void> fetchSigninSettings() async {
+    try {
+      DocumentSnapshot signinDoc =
+          await _firestore.collection('app_config').doc('Signin').get();
+
+      if (signinDoc.exists) {
+        Map<String, dynamic> data = signinDoc.data() as Map<String, dynamic>;
+        print('This is the data of the Signin settings: $data');
+
+        // Update the controller variables
+        signinButtonBackground.value =
+            data['signin_button_background'] ?? "FFFFFF";
+        signinButtonText.value =
+            data['signin_button_text'] ?? "Save and Continue";
+        signinButtonTextColor.value =
+            data['signin_button_textcolor'] ?? "000000";
+        signinErrorText.value = data['signin_error_text'] ??
+            "Please check your login details or register";
+        signinErrorTitle.value = data['signin_error_title'] ?? "Login error";
+      } else {
+        print("Signin document does not exist. Using default values.");
+      }
+    } catch (e) {
+      print("Error fetching Signin settings: $e");
     }
   }
 }

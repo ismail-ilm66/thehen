@@ -13,27 +13,31 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final SettingsController settingsController =
+      Get.put(SettingsController(), permanent: true);
+
   @override
   void initState() {
     super.initState();
-    Get.put(SettingsController(), permanent: true);
     Future.delayed(const Duration(seconds: 2), () {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-        final String? email = await SharedPreferencesHelper.getEmail();
-        if (email == null) {
-          Get.offAll(() => OnboardingScreen());
-        } else {
-          final String? name = await SharedPreferencesHelper.getName();
-          final String? password = await SharedPreferencesHelper.getPassword();
-          Get.offAll(() => HomeScreen(
-                email: email,
-                name: name!,
-                password: password!,
-                fromSignIn: true,
-              ));
-        }
-      });
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {});
     });
+  }
+
+  void checkValidation() async {
+    final String? email = await SharedPreferencesHelper.getEmail();
+    if (email == null) {
+      Get.offAll(() => OnboardingScreen());
+    } else {
+      final String? name = await SharedPreferencesHelper.getName();
+      final String? password = await SharedPreferencesHelper.getPassword();
+      Get.offAll(() => HomeScreen(
+            email: email,
+            name: name!,
+            password: password!,
+            fromSignIn: true,
+          ));
+    }
   }
 
   @override
@@ -48,10 +52,19 @@ class _SplashScreenState extends State<SplashScreen> {
               'assets/splash.png',
               height: 100,
             ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(
-              color: ColorPalette.blackColor,
-            ),
+            const SizedBox(height: 20),
+            Obx(() {
+              if (settingsController.isLoading.value) {
+                return const CircularProgressIndicator(
+                  color: ColorPalette.blackColor,
+                );
+              } else {
+                checkValidation();
+                return const CircularProgressIndicator(
+                  color: ColorPalette.blackColor,
+                );
+              }
+            }),
           ],
         ),
       ),
