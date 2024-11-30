@@ -30,14 +30,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _pageController = PageController(viewportFraction: 0.85);
+  final PageController _pageController = PageController(
+    viewportFraction: 0.85,
+  );
   final SettingsController settingsController = SettingsController();
   String name = '';
   late InAppWebViewController _webViewController;
   var currentUrl = "https://joyuful.com/login/".obs;
   final RxBool logoutLoading = false.obs;
 
-  int _currentPage = 0;
+  RxInt _currentPage = 0.obs;
   Future<void> clearWebViewSessionsAndCookies() async {
     try {
       logoutLoading.value = true;
@@ -124,146 +126,102 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: const Color(0xFFffc200),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Column(
-              children: [
-                Obx(
-                  () {
-                    if (settingsController.loadingHeroItems.value) {
-                      return SizedBox(
-                        height: 80.h,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: ColorPalette.primaryColor,
+      body: Column(
+        children: [
+          Expanded(
+            flex: 3,
+            child: SizedBox(
+              // height: screenHeight * 0.36,
+              child: Column(
+                children: [
+                  Obx(
+                    () {
+                      if (settingsController.loadingHeroItems.value) {
+                        return SizedBox(
+                          height: 80.h,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: ColorPalette.primaryColor,
+                            ),
                           ),
+                        );
+                      }
+                      if (settingsController.heroItems.isEmpty) {
+                        return SizedBox(
+                          height: 80.h,
+                          child: const Center(
+                            child: Text("No hero items found"),
+                          ),
+                        );
+                      }
+                      return CarouselSlider(
+                        options: CarouselOptions(
+                          height: MediaQuery.of(context).size.width *
+                              1.6 /
+                              3, // Maintain 3:2 ratio
+                          autoPlay: true,
+                          enlargeCenterPage: true,
+                          onPageChanged: (index, reason) {
+                            _currentPage.value = index;
+                          },
+                          viewportFraction:
+                              1, // Adjust the width of visible items
                         ),
-                      );
-                    }
-                    if (settingsController.heroItems.isEmpty) {
-                      return SizedBox(
-                        height: 80.h,
-                        child: const Center(
-                          child: Text("No hero items found"),
-                        ),
-                      );
-                    }
-                    return CarouselSlider(
-                      options: CarouselOptions(
-                        height: MediaQuery.of(context).size.width *
-                            2 /
-                            3, // Maintain 3:2 ratio
-                        autoPlay: true,
-                        enlargeCenterPage: true,
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            _currentPage = index;
-                          });
-                        },
-                        viewportFraction:
-                            1, // Adjust the width of visible items
-                      ),
-                      items: settingsController.heroItems.map((item) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return GestureDetector(
-                              onTap: () {
-                                _loadUrl(item.destination);
-                              },
-                              child: Container(
-                                width: MediaQuery.of(context).size.width * 0.85,
-                                height:
-                                    MediaQuery.of(context).size.width * 2 / 3,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 16.w, vertical: 8.h),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16.r),
-                                  image: DecorationImage(
-                                    image: NetworkImage(item.source),
-                                    fit: BoxFit.cover,
+                        items: settingsController.heroItems.map((item) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return GestureDetector(
+                                onTap: () {
+                                  _loadUrl(item.destination);
+                                },
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  height:
+                                      MediaQuery.of(context).size.width * 2 / 3,
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 16.w, vertical: 8.h),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16.r),
+                                    image: DecorationImage(
+                                      image: NetworkImage(item.source),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      }).toList(),
-                    );
-                    // return SizedBox(
-                    //   height: 140.h,
-                    //   child: PageView.builder(
-                    //     controller: _pageController,
-                    //     itemCount: settingsController.heroItems.length,
-                    //     onPageChanged: (index) {
-                    //       setState(() {
-                    //         _currentPage = index;
-                    //       });
-                    //     },
-                    //     itemBuilder: (context, index) {
-                    //       return AnimatedBuilder(
-                    //         animation: _pageController,
-                    //         builder: (context, child) {
-                    //           double value = 1.0;
-                    //           if (_pageController.position.haveDimensions) {
-                    //             value = _pageController.page! - index;
-                    //             value =
-                    //                 (1 - (value.abs() * 0.3)).clamp(0.8, 1.0);
-                    //           }
-
-                    //           return Center(
-                    //             child: SizedBox(
-                    //               height:
-                    //                   Curves.easeInOut.transform(value) * 200,
-                    //               child: child,
-                    //             ),
-                    //           );
-                    //         },
-                    //         child: GestureDetector(
-                    //           onTap: () {},
-                    //           child: Container(
-                    //             margin: EdgeInsets.symmetric(
-                    //                     horizontal: 16.w, vertical: 8.h)
-                    //                 .copyWith(bottom: 0),
-                    //             decoration: BoxDecoration(
-                    //               borderRadius: BorderRadius.circular(16.r),
-                    //               image: DecorationImage(
-                    //                 image: NetworkImage(settingsController
-                    //                     .heroItems[index].source),
-                    //                 fit: BoxFit.contain,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       );
-                    //     },
-                    //   ),
-                    // );
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-
-            // Slider Indicator
-            SmoothPageIndicator(
-              controller: _pageController,
-              count: settingsController.heroItems.length,
-              effect: const ExpandingDotsEffect(
-                activeDotColor: Color(0xFF000000),
-                dotColor: Color(0xFFB0B0B0),
-                dotHeight: 8,
-                dotWidth: 8,
-                expansionFactor: 3,
+                              );
+                            },
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                  Obx(
+                    () => SmoothPageIndicator(
+                      controller: PageController(
+                        initialPage: _currentPage.value,
+                      ),
+                      count: settingsController.heroItems.length,
+                      effect: const ExpandingDotsEffect(
+                        activeDotColor: Color(0xFF000000),
+                        dotColor: Color(0xFFB0B0B0),
+                        dotHeight: 8,
+                        dotWidth: 8,
+                        expansionFactor: 3,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 4.h),
-            const Divider(
-              color: ColorPalette.blackColor,
-            ),
-            Obx(
+          ),
+
+          // Slider Indicator
+
+          Expanded(
+            flex: 4,
+            child: Obx(
               () => SizedBox(
-                height: 400.h,
                 child: GestureDetector(
                   onVerticalDragUpdate: (_) => true,
                   child: InAppWebView(
@@ -340,210 +298,277 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 4.h),
-            const Divider(
-              color: ColorPalette.blackColor,
-            ),
-            Obx(() {
+          ),
+
+          Expanded(
+            flex: 2,
+            child: Obx(() {
               if (settingsController.navBarLoading.value) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
               return SizedBox(
-                // height: 120.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                        settingsController.navbarItems.length, (index) {
-                      final link = settingsController.navbarItems[index];
-                      return GestureDetector(
-                        onTap: () {
-                          _loadUrl(link.destination);
-                        },
-                        child: Container(
-                          width: double
-                              .infinity, // Make the container take full width
-                          margin: EdgeInsets.symmetric(
-                              vertical:
-                                  4.h), // Vertical spacing between buttons
-                          padding: EdgeInsets.all(8.r),
-                          decoration: BoxDecoration(
-                            color: Color(int.parse(
-                                "0xff${settingsController.navbarBackgroundColor.value}")),
-                            borderRadius: BorderRadius.circular(12.r),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 6,
-                                offset: Offset(2, 4),
-                              )
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.network(
-                                link.iconUrl,
-                                color: Color(
-                                  int.parse(
-                                    "0xff${settingsController.navbarIconColor.value}",
+                // height: screenHeight * 0.2,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w)
+                        .copyWith(top: 8.w),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                          settingsController.navbarItems.length + 1, (index) {
+                        if (index == settingsController.navbarItems.length) {
+                          return GestureDetector(
+                            onTap: () async {
+                              await clearWebViewSessionsAndCookies();
+                              await SharedPreferencesHelper.clearAll();
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginScreen(),
+                                ),
+                                (route) => false,
+                              );
+                              Get.snackbar(
+                                  'Logged Out', 'You have been logged out');
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              margin: EdgeInsets.symmetric(
+                                  vertical:
+                                      4.h), // Vertical spacing between buttons
+                              padding: EdgeInsets.all(8.r),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(12.r),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 6,
+                                    offset: Offset(2, 4),
+                                  )
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.logout,
+                                    color: Color(
+                                      int.parse(
+                                        "0xff${settingsController.navbarIconColor.value}",
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                height: settingsController.navbarIconSize.value,
-                                width: settingsController.navbarIconSize.value,
+                                  SizedBox(width: 8.h),
+                                  Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      color: Color(int.parse(
+                                          "0xff${settingsController.navbarTextColor.value}")),
+                                      fontSize: settingsController
+                                          .navbarTextSize.value,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 8.h),
-                              Text(
-                                link.label,
-                                style: TextStyle(
-                                  color: Color(int.parse(
-                                      "0xff${settingsController.navbarTextColor.value}")),
-                                  fontSize:
-                                      settingsController.navbarTextSize.value,
-                                  fontWeight: FontWeight.w600,
+                            ),
+                          );
+
+                          // return Padding(
+                          //   padding:
+                          //       const EdgeInsets.symmetric(horizontal: 16.0),
+                          //   child: Row(
+                          //     children: [
+                          //       Expanded(
+                          //         child: ElevatedButton(
+                          //           onPressed: () async {
+                          //             await clearWebViewSessionsAndCookies();
+                          //             await SharedPreferencesHelper.clearAll();
+                          //             Navigator.pushAndRemoveUntil(
+                          //               context,
+                          //               MaterialPageRoute(
+                          //                 builder: (context) => LoginScreen(),
+                          //               ),
+                          //               (route) => false,
+                          //             );
+                          //             Get.snackbar('Logged Out',
+                          //                 'You have been logged out');
+                          //           },
+                          //           style: ElevatedButton.styleFrom(
+                          //             backgroundColor: Colors.red,
+                          //             shape: RoundedRectangleBorder(
+                          //               borderRadius: BorderRadius.circular(16),
+                          //             ),
+                          //             padding: const EdgeInsets.symmetric(
+                          //                 vertical: 16, horizontal: 32),
+                          //             elevation: 6,
+                          //           ),
+                          //           child: Obx(
+                          //             () => logoutLoading.value
+                          //                 ? const CircularProgressIndicator(
+                          //                     color: Colors.white,
+                          //                   )
+                          //                 : const Text(
+                          //                     'Logout',
+                          //                     style: TextStyle(
+                          //                       color: Colors.white,
+                          //                       fontSize: 18,
+                          //                       fontWeight: FontWeight.bold,
+                          //                     ),
+                          //                   ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // );
+                        }
+
+                        final link = settingsController.navbarItems[index];
+                        return GestureDetector(
+                          onTap: () {
+                            _loadUrl(link.destination);
+                          },
+                          child: Container(
+                            width: double
+                                .infinity, // Make the container take full width
+                            margin: EdgeInsets.symmetric(
+                                vertical:
+                                    4.h), // Vertical spacing between buttons
+                            padding: EdgeInsets.all(8.r),
+                            decoration: BoxDecoration(
+                              color: Color(int.parse(
+                                  "0xff${settingsController.navbarBackgroundColor.value}")),
+                              borderRadius: BorderRadius.circular(12.r),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 6,
+                                  offset: Offset(2, 4),
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.network(
+                                  link.iconUrl,
+                                  color: Color(
+                                    int.parse(
+                                      "0xff${settingsController.navbarIconColor.value}",
+                                    ),
+                                  ),
+                                  height:
+                                      settingsController.navbarIconSize.value,
+                                  width:
+                                      settingsController.navbarIconSize.value,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                                SizedBox(width: 8.h),
+                                Text(
+                                  link.label,
+                                  style: TextStyle(
+                                    color: Color(int.parse(
+                                        "0xff${settingsController.navbarTextColor.value}")),
+                                    fontSize:
+                                        settingsController.navbarTextSize.value,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
                 ),
               );
             }),
+          ),
 
-            // Obx(() {
-            //   if (settingsController.navBarLoading.value) {
-            //     return const Center(
-            //       child: CircularProgressIndicator(),
-            //     );
-            //   }
-            //   return Expanded(
-            //     child: SizedBox(
-            //       height: 120.h,
-            //       child: Padding(
-            //         padding: EdgeInsets.symmetric(horizontal: 16.w),
-            //         child: Column(
-            //           mainAxisAlignment: MainAxisAlignment.center,
-            //           children: List.generate(
-            //               settingsController.navbarItems.length, (index) {
-            //             final link = settingsController.navbarItems[index];
-            //             return Expanded(
-            //               child: GestureDetector(
-            //                 onTap: () {
-            //                   _loadUrl(link.destination);
-            //                 },
-            //                 child: Container(
-            //                   margin: EdgeInsets.symmetric(horizontal: 4.w),
-            //                   padding: EdgeInsets.all(8.r),
-            //                   decoration: BoxDecoration(
-            //                     color: Color(int.parse(
-            //                         "0xff${settingsController.navbarBackgroundColor.value}")),
-            //                     borderRadius: BorderRadius.circular(12.r),
-            //                     boxShadow: const [
-            //                       BoxShadow(
-            //                         color: Colors.black26,
-            //                         blurRadius: 6,
-            //                         offset: Offset(2, 4),
-            //                       )
-            //                     ],
-            //                   ),
-            //                   child: Column(
-            //                     mainAxisAlignment: MainAxisAlignment.center,
-            //                     children: [
-            //                       Image.network(
-            //                         link.iconUrl,
-            //                         color: Color(
-            //                           int.parse(
-            //                             "0xff${settingsController.navbarIconColor.value}",
-            //                           ),
-            //                         ),
-            //                         height:
-            //                             settingsController.navbarIconSize.value,
-            //                         width:
-            //                             settingsController.navbarIconSize.value,
-            //                       ),
-            //                       SizedBox(height: 8.h),
-            //                       Text(
-            //                         link.label,
-            //                         style: TextStyle(
-            //                           color: Color(int.parse(
-            //                               "0xff${settingsController.navbarTextColor.value}")),
-            //                           fontSize:
-            //                               settingsController.navbarTextSize.value,
-            //                           fontWeight: FontWeight.w600,
-            //                         ),
-            //                         textAlign: TextAlign.center,
-            //                       ),
-            //                     ],
-            //                   ),
-            //                 ),
-            //               ),
-            //             );
-            //           }),
-            //         ),
-            //       ),
-            //     ),
-            //   );
-            // }),
-
-            SizedBox(height: 8.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        await clearWebViewSessionsAndCookies();
-                        await SharedPreferencesHelper.clearAll();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ),
-                          (route) => false,
-                        );
-                        Get.snackbar('Logged Out', 'You have been logged out');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 32),
-                        elevation: 6,
-                      ),
-                      child: Obx(
-                        () => logoutLoading.value
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                'Logout',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          // Obx(() {
+          //   if (settingsController.navBarLoading.value) {
+          //     return const Center(
+          //       child: CircularProgressIndicator(),
+          //     );
+          //   }
+          //   return Expanded(
+          //     child: SizedBox(
+          //       height: 120.h,
+          //       child: Padding(
+          //         padding: EdgeInsets.symmetric(horizontal: 16.w),
+          //         child: Column(
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           children: List.generate(
+          //               settingsController.navbarItems.length, (index) {
+          //             final link = settingsController.navbarItems[index];
+          //             return Expanded(
+          //               child: GestureDetector(
+          //                 onTap: () {
+          //                   _loadUrl(link.destination);
+          //                 },
+          //                 child: Container(
+          //                   margin: EdgeInsets.symmetric(horizontal: 4.w),
+          //                   padding: EdgeInsets.all(8.r),
+          //                   decoration: BoxDecoration(
+          //                     color: Color(int.parse(
+          //                         "0xff${settingsController.navbarBackgroundColor.value}")),
+          //                     borderRadius: BorderRadius.circular(12.r),
+          //                     boxShadow: const [
+          //                       BoxShadow(
+          //                         color: Colors.black26,
+          //                         blurRadius: 6,
+          //                         offset: Offset(2, 4),
+          //                       )
+          //                     ],
+          //                   ),
+          //                   child: Column(
+          //                     mainAxisAlignment: MainAxisAlignment.center,
+          //                     children: [
+          //                       Image.network(
+          //                         link.iconUrl,
+          //                         color: Color(
+          //                           int.parse(
+          //                             "0xff${settingsController.navbarIconColor.value}",
+          //                           ),
+          //                         ),
+          //                         height:
+          //                             settingsController.navbarIconSize.value,
+          //                         width:
+          //                             settingsController.navbarIconSize.value,
+          //                       ),
+          //                       SizedBox(height: 8.h),
+          //                       Text(
+          //                         link.label,
+          //                         style: TextStyle(
+          //                           color: Color(int.parse(
+          //                               "0xff${settingsController.navbarTextColor.value}")),
+          //                           fontSize:
+          //                               settingsController.navbarTextSize.value,
+          //                           fontWeight: FontWeight.w600,
+          //                         ),
+          //                         textAlign: TextAlign.center,
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //             );
+          //           }),
+          //         ),
+          //       ),
+          //     ),
+          //   );
+          // }),
+        ],
       ),
     );
   }
