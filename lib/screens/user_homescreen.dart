@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           Expanded(
-            flex: 3,
+            flex: settingsController.carouselFlexValue.value,
             child: SizedBox(
               // height: screenHeight * 0.36,
               child: Column(
@@ -156,9 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       return CarouselSlider(
                         options: CarouselOptions(
-                          height: MediaQuery.of(context).size.width *
-                              1.6 /
-                              3, // Maintain 3:2 ratio
+                          height: MediaQuery.of(context).size.width * 1.6 / 3,
                           autoPlay: true,
                           enlargeCenterPage: true,
                           onPageChanged: (index, reason) {
@@ -219,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Slider Indicator
 
           Expanded(
-            flex: 4,
+            flex: settingsController.webViewFlexValue.value,
             child: Obx(
               () => SizedBox(
                 child: GestureDetector(
@@ -301,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           Expanded(
-            flex: 2,
+            flex: settingsController.navBarFlexValue.value,
             child: Obx(() {
               if (settingsController.navBarLoading.value) {
                 return const Center(

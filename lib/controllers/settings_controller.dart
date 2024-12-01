@@ -37,6 +37,11 @@ class SettingsController extends GetxController {
   final RxString signinErrorText = "".obs;
   final RxString signinErrorTitle = "".obs;
 
+  //Home Screen Items:
+  RxInt carouselFlexValue = 3.obs;
+  RxInt navBarFlexValue = 2.obs;
+  RxInt webViewFlexValue = 5.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -50,6 +55,7 @@ class SettingsController extends GetxController {
     await fetchSignUpDetails();
     await fetchNavbarSettings();
     await fetchNavbarItems();
+    await fetchHomeScreenFlexValues();
     await fetchHeroItems();
     isLoading.value = false;
   }
@@ -230,6 +236,31 @@ class SettingsController extends GetxController {
       }
     } catch (e) {
       print("Error fetching Signin settings: $e");
+    }
+  }
+
+  Future<void> fetchHomeScreenFlexValues() async {
+    try {
+      DocumentSnapshot homeScreenDoc =
+          await _firestore.collection('app_config').doc('Homescreen').get();
+
+      if (homeScreenDoc.exists) {
+        Map<String, dynamic> data =
+            homeScreenDoc.data() as Map<String, dynamic>;
+        print('This is the data of the Homescreen flex values: $data');
+
+        int carouselFlex = data['carousel_flex'] ?? 3;
+        int navBarFlex = data['nav_bar_flex'] ?? 2;
+        int webViewFlex = data['web_view_flex'] ?? 5;
+
+        print('Carousel Flex: $carouselFlex');
+        print('Navbar Flex: $navBarFlex');
+        print('Web View Flex: $webViewFlex');
+      } else {
+        print("Homescreen document does not exist. Using default values.");
+      }
+    } catch (e) {
+      print("Error fetching Homescreen flex values: $e");
     }
   }
 }
