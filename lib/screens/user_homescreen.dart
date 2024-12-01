@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       return CarouselSlider(
                         options: CarouselOptions(
-                          height: MediaQuery.of(context).size.width * 1.6 / 3,
+                          // height: MediaQuery.of(context).size.width * 1.6 / 3,
                           autoPlay: true,
                           enlargeCenterPage: true,
                           onPageChanged: (index, reason) {
@@ -173,10 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   _loadUrl(item.destination);
                                 },
                                 child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.85,
-                                  height:
-                                      MediaQuery.of(context).size.width * 2 / 3,
+                                  // width:
+                                  //     MediaQuery.of(context).size.width * 0.85,
+                                  // height:
+                                  //     MediaQuery.of(context).size.width * 2 / 3,
                                   margin: EdgeInsets.symmetric(
                                       horizontal: 16.w, vertical: 8.h),
                                   decoration: BoxDecoration(
@@ -431,7 +431,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         final link = settingsController.navbarItems[index];
                         return GestureDetector(
                           onTap: () {
-                            _loadUrl(link.destination);
+                            // _loadUrl(link.destination);
+                            Get.to(() => AutoLoginPage(
+                                  email: widget.email,
+                                  password: widget.password,
+                                  firstTime: false,
+                                  otherUrl: link.destination,
+                                ));
                           },
                           child: Container(
                             width: double
