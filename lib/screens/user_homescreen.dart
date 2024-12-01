@@ -30,9 +30,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final PageController _pageController = PageController(
-    viewportFraction: 0.85,
-  );
   final SettingsController settingsController = SettingsController();
   String name = '';
   late InAppWebViewController _webViewController;
@@ -133,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SizedBox(
               // height: screenHeight * 0.36,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Obx(
                     () {
@@ -156,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       return CarouselSlider(
                         options: CarouselOptions(
-                          // height: MediaQuery.of(context).size.width * 1.6 / 3,
+                          height: MediaQuery.of(context).size.width * 1.4 / 3,
                           autoPlay: true,
                           enlargeCenterPage: true,
                           onPageChanged: (index, reason) {
@@ -173,10 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   _loadUrl(item.destination);
                                 },
                                 child: Container(
-                                  // width:
-                                  //     MediaQuery.of(context).size.width * 0.85,
-                                  // height:
-                                  //     MediaQuery.of(context).size.width * 2 / 3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  height:
+                                      MediaQuery.of(context).size.width * 2 / 3,
                                   margin: EdgeInsets.symmetric(
                                       horizontal: 16.w, vertical: 8.h),
                                   decoration: BoxDecoration(
