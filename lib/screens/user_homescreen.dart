@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:wordpress/colors.dart';
 import 'package:wordpress/controllers/settings_controller.dart';
+import 'package:wordpress/helpers/helper_functions.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/screens/auto_login.dart';
 import 'package:wordpress/screens/login.dart';
@@ -110,18 +111,28 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
+            // Text(settingsController.headerTitle.value),
             Text("Welcome $name"),
+
             const SizedBox(
               width: 8,
             ),
-            Image.asset(
-              'assets/joyuful-icon.png',
-              height: 35,
-              width: 35,
-            ),
+            if (settingsController.headerIcon.value.isEmpty)
+              Image.asset(
+                'assets/joyuful-icon.png',
+                height: 35,
+                width: 35,
+              ),
+            if (settingsController.headerIcon.value.isNotEmpty)
+              Image.network(
+                settingsController.headerIcon.value,
+                height: 35,
+                width: 35,
+              ),
           ],
         ),
-        backgroundColor: const Color(0xFFffc200),
+        backgroundColor: HelperFunctions.convertColor(
+            settingsController.headerBgColor.value),
       ),
       body: Column(
         children: [
@@ -225,7 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ..add(Factory<OneSequenceGestureRecognizer>(
                           () => EagerGestureRecognizer())),
                     initialUrlRequest: URLRequest(
-                      url: WebUri(currentUrl.value),
+                      url:
+                          WebUri(settingsController.dashboardDestination.value),
                     ),
                     initialSettings: InAppWebViewSettings(
                       javaScriptEnabled: true,
@@ -358,6 +370,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         "0xff${settingsController.navbarIconColor.value}",
                                       ),
                                     ),
+                                    size:
+                                        settingsController.navbarIconSize.value,
                                   ),
                                   SizedBox(width: 8.h),
                                   Text(
@@ -375,55 +389,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           );
-
-                          // return Padding(
-                          //   padding:
-                          //       const EdgeInsets.symmetric(horizontal: 16.0),
-                          //   child: Row(
-                          //     children: [
-                          //       Expanded(
-                          //         child: ElevatedButton(
-                          //           onPressed: () async {
-                          //             await clearWebViewSessionsAndCookies();
-                          //             await SharedPreferencesHelper.clearAll();
-                          //             Navigator.pushAndRemoveUntil(
-                          //               context,
-                          //               MaterialPageRoute(
-                          //                 builder: (context) => LoginScreen(),
-                          //               ),
-                          //               (route) => false,
-                          //             );
-                          //             Get.snackbar('Logged Out',
-                          //                 'You have been logged out');
-                          //           },
-                          //           style: ElevatedButton.styleFrom(
-                          //             backgroundColor: Colors.red,
-                          //             shape: RoundedRectangleBorder(
-                          //               borderRadius: BorderRadius.circular(16),
-                          //             ),
-                          //             padding: const EdgeInsets.symmetric(
-                          //                 vertical: 16, horizontal: 32),
-                          //             elevation: 6,
-                          //           ),
-                          //           child: Obx(
-                          //             () => logoutLoading.value
-                          //                 ? const CircularProgressIndicator(
-                          //                     color: Colors.white,
-                          //                   )
-                          //                 : const Text(
-                          //                     'Logout',
-                          //                     style: TextStyle(
-                          //                       color: Colors.white,
-                          //                       fontSize: 18,
-                          //                       fontWeight: FontWeight.bold,
-                          //                     ),
-                          //                   ),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // );
                         }
 
                         final link = settingsController.navbarItems[index];
@@ -438,11 +403,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ));
                           },
                           child: Container(
-                            width: double
-                                .infinity, // Make the container take full width
-                            margin: EdgeInsets.symmetric(
-                                vertical:
-                                    4.h), // Vertical spacing between buttons
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(vertical: 4.h),
                             padding: EdgeInsets.all(8.r),
                             decoration: BoxDecoration(
                               color: Color(int.parse(

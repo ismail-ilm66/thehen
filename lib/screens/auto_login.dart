@@ -3,7 +3,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wordpress/colors.dart';
+import 'package:wordpress/controllers/settings_controller.dart';
 import 'package:wordpress/controllers/web_controller.dart';
+import 'package:wordpress/helpers/helper_functions.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/screens/login.dart';
 
@@ -24,6 +26,8 @@ class AutoLoginPage extends StatelessWidget {
   final WebViewController webViewController =
       Get.put(WebViewController()); // Instantiate the controller
 
+  final SettingsController settingsController = SettingsController();
+
   Future<int> getCookiesCountForUrl(String url) async {
     final cookies = await CookieManager.instance().getCookies(url: WebUri(url));
     print("Cookies for $url: ${cookies.length}");
@@ -34,8 +38,9 @@ class AutoLoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Joyuful"),
-        backgroundColor: ColorPalette.primaryColor,
+        title: Text(settingsController.headerTitle.value),
+        backgroundColor: HelperFunctions.convertColor(
+            settingsController.headerBgColor.value),
       ),
       body: Stack(
         children: [

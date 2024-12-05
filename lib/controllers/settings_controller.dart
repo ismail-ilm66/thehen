@@ -42,6 +42,18 @@ class SettingsController extends GetxController {
   RxInt navBarFlexValue = 2.obs;
   RxInt webViewFlexValue = 5.obs;
 
+  // Theme Settings
+  final RxString headerBgColor = "Colors.white".obs;
+  final RxString headerIcon = "".obs;
+  final RxString headerTitle = "Joyuful".obs;
+  final RxString gradientBegin = "Alignment.center".obs;
+  final RxString gradientEnd = "Alignment.center".obs;
+  final RxString gradientType = "None".obs;
+  final RxList<String> gradientColors = <String>[].obs;
+
+//Dashboard
+  final RxString dashboardDestination = 'www.google.com'.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -51,12 +63,15 @@ class SettingsController extends GetxController {
 
   void fetchAllItems() async {
     await fetchOnboardingItems();
+    await fetchThemeSettings();
     await fetchSigninSettings();
     await fetchSignUpDetails();
     await fetchNavbarSettings();
     await fetchNavbarItems();
     await fetchHomeScreenFlexValues();
     await fetchHeroItems();
+    await fetchDashboardSettings();
+
     isLoading.value = false;
   }
 
@@ -261,6 +276,59 @@ class SettingsController extends GetxController {
       }
     } catch (e) {
       print("Error fetching Homescreen flex values: $e");
+    }
+  }
+
+  Future<void> fetchThemeSettings() async {
+    try {
+      DocumentSnapshot themeDoc =
+          await _firestore.collection('app_config').doc('Theme').get();
+
+      if (themeDoc.exists) {
+        Map<String, dynamic> data = themeDoc.data() as Map<String, dynamic>;
+        print('This is the data of the Theme settings: $data');
+
+        headerBgColor.value = data['header_bg_color'] ?? "Colors.white";
+        headerIcon.value = data['header_icon'] ?? "";
+        headerTitle.value = data['header_title'] ?? "Default Title";
+        gradientBegin.value =
+            data['theme_gradient_begin'] ?? "Alignment.center";
+        gradientEnd.value = data['theme_gradient_end'] ?? "Alignment.center";
+        gradientType.value = data['theme_gradient_type'] ?? "None";
+        gradientColors.value =
+            (data['theme_gradient_colors'] as String?)?.split(",") ?? [];
+
+        print('Header Background Color: ${headerBgColor.value}');
+        print('Header Icon: ${headerIcon.value}');
+        print('Header Title: ${headerTitle.value}');
+        print('Gradient Begin: ${gradientBegin.value}');
+        print('Gradient End: ${gradientEnd.value}');
+        print('Gradient Type: ${gradientType.value}');
+        print('Gradient Colors: ${gradientColors}');
+      } else {
+        print("Theme document does not exist.");
+      }
+    } catch (e) {
+      print("Error fetching Theme settings: $e");
+    }
+  }
+
+  Future<void> fetchDashboardSettings() async {
+    try {
+      DocumentSnapshot dashboardDoc =
+          await _firestore.collection('app_config').doc('Dashboard').get();
+
+      if (dashboardDoc.exists) {
+        Map<String, dynamic> data = dashboardDoc.data() as Map<String, dynamic>;
+        print('This is the data of the Dashboard settings: $data');
+
+        // Update the reactive variable
+        dashboardDestination.value = data['destination'] ?? '';
+      } else {
+        print("Dashboard document does not exist.");
+      }
+    } catch (e) {
+      print("Error fetching Dashboard settings: $e");
     }
   }
 }
