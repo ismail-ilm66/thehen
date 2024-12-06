@@ -14,11 +14,26 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   List<Widget> wid = [];
+  List<Color> convertHexToColors(List<String> hexColors) {
+    return hexColors.map((hexColor) {
+      print('This is the hex in the loop: $hexColor');
+      return Color(int.parse('0xff$hexColor'));
+    }).toList();
+  }
+
+  List<Color> gradientColors = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    print('This is the length');
+    gradientColors = convertHexToColors(settingsController.gradientColors);
+    print('This is the gradientColors:${gradientColors.length}');
+    for (var i in settingsController.onboardingItems) {
+      print('This is the title:${i.title}');
+    }
+
     wid = [
       buildOnboardPage(
         title: "Welcome to Joyful",
@@ -67,9 +82,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     // Convert hex string to a Color object
     if (hex.length == 6) {
-      return Color(int.parse('0xFF$hex')); // Assuming hex is in RGB format (6 characters)
+      return Color(int.parse('0xFF$hex'));
     } else if (hex.length == 8) {
-      return Color(int.parse('0x$hex')); // Assuming hex is in ARGB format (8 characters)
+      return Color(int.parse('0x$hex'));
     }
 
     throw FormatException('Invalid hex color format: $hex');
@@ -77,7 +92,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('This is the gradientType:${settingsController.gradientType.value}  }');
+    print('This is the gradientType:${settingsController.gradientType.value}}');
     return Scaffold(
       // backgroundColor: ColorPalette.primaryColor,
       body: Container(
@@ -88,33 +103,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       settingsController.gradientBegin.value),
                   end: HelperFunctions.convertAlignment(
                       settingsController.gradientEnd.value),
-            colors: settingsController.gradientColors
-                .map((color) => _colorFromHex(color)) // Convert hex string to Color
-                .toList(),
-                  )
-
-
+                  colors: gradientColors,
+                )
               : settingsController.gradientType.value == "RadialGradient"
                   ? RadialGradient(
                       center: HelperFunctions.convertAlignment(
                           settingsController.gradientBegin.value),
                       radius: 0.5,
-            colors: settingsController.gradientColors
-                .map((color) => _colorFromHex(color)) // Convert hex string to Color
-                .toList(),
+                      colors: gradientColors,
                     )
                   : settingsController.gradientType.value == "SweepGradient"
                       ? SweepGradient(
                           center: HelperFunctions.convertAlignment(
                               settingsController.gradientBegin.value),
-            colors: settingsController.gradientColors
-                .map((color) => _colorFromHex(color)) // Convert hex string to Color
-                .toList(),
+                          colors: gradientColors,
                         )
                       : null,
           color: settingsController.gradientType.value == null
-              ? HelperFunctions.convertColor(
-                  settingsController.headerBgColor.value)
+              ? Color(
+                  int.parse('0xff${settingsController.headerBgColor.value}'))
               : null, // Use solid color only if gradient type is null
         ),
         child: Column(
@@ -125,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 children: settingsController.onboardingItems.isEmpty
                     ? wid
                     : settingsController.onboardingItems
-                        .asMap() // Use asMap() to get the index
+                        .asMap()
                         .map((index, item) => MapEntry(
                               index,
                               buildOnboardPage(
@@ -204,7 +211,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             image,
             height: 100,
             width: 100,
-            color: ColorPalette.blackColor,
+            // color: ColorPalette.blackColor,
           ),
           const SizedBox(height: 30),
           Text(

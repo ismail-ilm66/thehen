@@ -31,7 +31,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final SettingsController settingsController = SettingsController();
+  final SettingsController settingsController = Get.find();
   String name = '';
   late InAppWebViewController _webViewController;
   var currentUrl = "https://joyuful.com/login/".obs;
@@ -72,6 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     print(
+        "This is the header background color in init: ${settingsController.headerBgColor.value}");
+    print(
         'This is the length of the navbar items: ${settingsController.navbarItems.length}');
     settingsController.fetchNavbarItems();
     settingsController.fetchHeroItems();
@@ -105,8 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('This is the header icon: ${settingsController.headerIcon.value}');
+    print(
+        'This is the background color: ${settingsController.headerBgColor.value}');
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      // backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Row(
@@ -131,9 +136,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
           ],
         ),
-        backgroundColor: HelperFunctions.convertColor(
-            settingsController.headerBgColor.value),
+        backgroundColor: Color(
+          int.parse(
+            '0xff${settingsController.headerBgColor.value}',
+          ),
+        ),
+        // backgroundColor: Colors.pink,
       ),
+
       body: Column(
         children: [
           Expanded(
@@ -424,6 +434,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Image.network(
                                   link.iconUrl,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(
+                                      Icons.error,
+                                      color: Color(
+                                        int.parse(
+                                          "0xff${settingsController.navbarIconColor.value}",
+                                        ),
+                                      ),
+                                    );
+                                  },
                                   color: Color(
                                     int.parse(
                                       "0xff${settingsController.navbarIconColor.value}",

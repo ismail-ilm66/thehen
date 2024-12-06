@@ -161,7 +161,7 @@ class SettingsController extends GetxController {
     try {
       loadingOnboardingItems.value = true;
       DocumentSnapshot onboardingDoc =
-          await _firestore.collection('app_config').doc('onboarding').get();
+          await _firestore.collection('app_config').doc('Onboarding').get();
 
       if (onboardingDoc.exists) {
         Map<String, dynamic> data =
@@ -288,17 +288,19 @@ class SettingsController extends GetxController {
         Map<String, dynamic> data = themeDoc.data() as Map<String, dynamic>;
         print('This is the data of the Theme settings: $data');
 
-        headerBgColor.value = data['header_bg_color'] ?? "Colors.white";
+        headerBgColor.value = data['header_bg_color'];
+        print("This is the headerBgColor: ${headerBgColor.value}");
         headerIcon.value = data['header_icon'] ?? "";
         headerTitle.value = data['header_title'] ?? "Default Title";
         gradientBegin.value =
             data['theme_gradient_begin'] ?? "Alignment.center";
         gradientEnd.value = data['theme_gradient_end'] ?? "Alignment.center";
         gradientType.value = data['theme_gradient_type'] ?? "None";
+        print(
+            'This is the type of the gradient colors: ${data['theme_gradient_colors'].runtimeType}');
         gradientColors.value = (data['theme_gradient_colors'] as List<dynamic>)
-            .map((colorString) => colorString)
-            .toList() as List<String>;
-
+            .map((colorString) => colorString as String)
+            .toList();
 
         print('Header Background Color: ${headerBgColor.value}');
         print('Header Icon: ${headerIcon.value}');

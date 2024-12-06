@@ -26,7 +26,7 @@ class AutoLoginPage extends StatelessWidget {
   final WebViewController webViewController =
       Get.put(WebViewController()); // Instantiate the controller
 
-  final SettingsController settingsController = SettingsController();
+  final SettingsController settingsController = Get.find();
 
   Future<int> getCookiesCountForUrl(String url) async {
     final cookies = await CookieManager.instance().getCookies(url: WebUri(url));
@@ -39,8 +39,8 @@ class AutoLoginPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(settingsController.headerTitle.value),
-        backgroundColor: HelperFunctions.convertColor(
-            settingsController.headerBgColor.value),
+        backgroundColor:
+            Color(int.parse('0xff${settingsController.headerBgColor.value}')),
       ),
       body: Stack(
         children: [
