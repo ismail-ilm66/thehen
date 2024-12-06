@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class HelperFunctions {
   static Color convertColor(String colorString) {
     try {
+      print('This is the colorString:$colorString ');
       // Check for named colors like "Colors.red"
       if (colorString.startsWith("Colors.")) {
+        print('in the colors. condition');
         return Colors.primaries.firstWhere(
           (color) => color.toString().contains(colorString.split(".")[1]),
           orElse: () => const MaterialColor(0xFFFFFFFF, {}),

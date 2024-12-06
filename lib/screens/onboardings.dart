@@ -60,9 +60,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final PageController _controller = PageController();
   final SettingsController settingsController = Get.find();
+  Color _colorFromHex(String hex) {
+    // Remove '#' if it's there
+    hex = hex.replaceAll('#', '');
+    print('This is the hex:$hex');
+
+    // Convert hex string to a Color object
+    if (hex.length == 6) {
+      return Color(int.parse('0xFF$hex')); // Assuming hex is in RGB format (6 characters)
+    } else if (hex.length == 8) {
+      return Color(int.parse('0x$hex')); // Assuming hex is in ARGB format (8 characters)
+    }
+
+    throw FormatException('Invalid hex color format: $hex');
+  }
 
   @override
   Widget build(BuildContext context) {
+    print('This is the gradientType:${settingsController.gradientType.value}  }');
     return Scaffold(
       // backgroundColor: ColorPalette.primaryColor,
       body: Container(
@@ -73,27 +88,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       settingsController.gradientBegin.value),
                   end: HelperFunctions.convertAlignment(
                       settingsController.gradientEnd.value),
-                  colors: settingsController.gradientColors
-                      .map((color) => HelperFunctions.convertColor(color))
-                      .toList(),
-                )
+            colors: settingsController.gradientColors
+                .map((color) => _colorFromHex(color)) // Convert hex string to Color
+                .toList(),
+                  )
+
+
               : settingsController.gradientType.value == "RadialGradient"
                   ? RadialGradient(
                       center: HelperFunctions.convertAlignment(
                           settingsController.gradientBegin.value),
                       radius: 0.5,
-                      colors: settingsController.gradientColors
-                          .map((color) => HelperFunctions.convertColor(color))
-                          .toList(),
+            colors: settingsController.gradientColors
+                .map((color) => _colorFromHex(color)) // Convert hex string to Color
+                .toList(),
                     )
                   : settingsController.gradientType.value == "SweepGradient"
                       ? SweepGradient(
                           center: HelperFunctions.convertAlignment(
                               settingsController.gradientBegin.value),
-                          colors: settingsController.gradientColors
-                              .map((color) =>
-                                  HelperFunctions.convertColor(color))
-                              .toList(),
+            colors: settingsController.gradientColors
+                .map((color) => _colorFromHex(color)) // Convert hex string to Color
+                .toList(),
                         )
                       : null,
           color: settingsController.gradientType.value == null

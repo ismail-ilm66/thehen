@@ -43,7 +43,7 @@ class SettingsController extends GetxController {
   RxInt webViewFlexValue = 5.obs;
 
   // Theme Settings
-  final RxString headerBgColor = "Colors.white".obs;
+  final RxString headerBgColor = "000000".obs;
   final RxString headerIcon = "".obs;
   final RxString headerTitle = "Joyuful".obs;
   final RxString gradientBegin = "Alignment.center".obs;
@@ -295,8 +295,10 @@ class SettingsController extends GetxController {
             data['theme_gradient_begin'] ?? "Alignment.center";
         gradientEnd.value = data['theme_gradient_end'] ?? "Alignment.center";
         gradientType.value = data['theme_gradient_type'] ?? "None";
-        gradientColors.value =
-            (data['theme_gradient_colors'] as String?)?.split(",") ?? [];
+        gradientColors.value = (data['theme_gradient_colors'] as List<dynamic>)
+            .map((colorString) => colorString)
+            .toList() as List<String>;
+
 
         print('Header Background Color: ${headerBgColor.value}');
         print('Header Icon: ${headerIcon.value}');
