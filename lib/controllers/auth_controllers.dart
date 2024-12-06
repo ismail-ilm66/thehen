@@ -80,61 +80,53 @@ class AuthController extends GetxController {
     isLoading.value = true;
     errorMessage.value = '';
 
-    if (username == "admin" && password == "admin1@") {
-      //_showSnackbar("Login successful!", ColorPalette.greenColor, );
-      Get.snackbar("Success", "Welcome, ${username.value}");
-      //_saveTokenToFirestore(username);
-      Get.to(() => DashboardScreen());
-      isLoading.value = false;
-    } else {
-      try {
-        final response = await http.post(
-          Uri.parse(apiUrl),
-          body: {
-            'username': username.value,
-            'password': password.value,
-            if (device.value.isNotEmpty) 'device': device.value,
-          },
-        );
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: {
+          'username': username.value,
+          'password': password.value,
+          if (device.value.isNotEmpty) 'device': device.value,
+        },
+      );
 
-        final responseData = json.decode(response.body);
-        print('This is the response of the login api: $responseData');
+      final responseData = json.decode(response.body);
+      print('This is the response of the login api: $responseData');
 // Parse response
-        tokenResponse.value = TokenResponse.fromJson(responseData);
+      tokenResponse.value = TokenResponse.fromJson(responseData);
 
-        if (tokenResponse.value?.token != null) {
-          // Success response
-          // Get.to(() => WebViewScreen(token: tokenResponse.value!.token!));
-          await saveTokenToFirestore(username.value);
-          name.value = tokenResponse.value!.userDisplayName ?? 'No name';
-          await SharedPreferencesHelper.setEmail(username.value);
-          await SharedPreferencesHelper.setPassword(password.value);
-          await SharedPreferencesHelper.setName(name.value);
-          // Get.to(() =>
-          //     AutoLoginPage(email: username.value, password: password.value));
-          Get.offAll(
-            () => HomeScreen(
-              name: name.value,
-              email: username.value,
-              password: password.value,
-              fromSignIn: true,
-            ),
-          );
-          Get.snackbar(
-              "Success", "Welcome, ${tokenResponse.value!.userDisplayName}");
-        } else {
-          // Error response
-          errorMessage.value =
-              tokenResponse.value?.errorMessage ?? "Login failed";
-          Get.snackbar(settingsController.signinErrorTitle.value,
-              settingsController.signinErrorText.value);
-        }
-      } catch (e) {
-        errorMessage.value = "An unexpected error occurred: $e";
-        Get.snackbar("Error", errorMessage.value);
-      } finally {
-        isLoading.value = false; // Hide loading spinner
+      if (tokenResponse.value?.token != null) {
+        // Success response
+        // Get.to(() => WebViewScreen(token: tokenResponse.value!.token!));
+        await saveTokenToFirestore(username.value);
+        name.value = tokenResponse.value!.userDisplayName ?? 'No name';
+        await SharedPreferencesHelper.setEmail(username.value);
+        await SharedPreferencesHelper.setPassword(password.value);
+        await SharedPreferencesHelper.setName(name.value);
+        // Get.to(() =>
+        //     AutoLoginPage(email: username.value, password: password.value));
+        Get.offAll(
+          () => HomeScreen(
+            name: name.value,
+            email: username.value,
+            password: password.value,
+            fromSignIn: true,
+          ),
+        );
+        Get.snackbar(
+            "Success", "Welcome, ${tokenResponse.value!.userDisplayName}");
+      } else {
+        // Error response
+        errorMessage.value =
+            tokenResponse.value?.errorMessage ?? "Login failed";
+        Get.snackbar(settingsController.signinErrorTitle.value,
+            settingsController.signinErrorText.value);
       }
+    } catch (e) {
+      errorMessage.value = "An unexpected error occurred: $e";
+      Get.snackbar("Error", errorMessage.value);
+    } finally {
+      isLoading.value = false; // Hide loading spinner
     }
   }
 
