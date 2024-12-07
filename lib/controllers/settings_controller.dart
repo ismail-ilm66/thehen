@@ -54,6 +54,9 @@ class SettingsController extends GetxController {
 //Dashboard
   final RxString dashboardDestination = 'www.google.com'.obs;
 
+  //Drawer Items
+  final RxString drawerBgColor = "ffffff".obs;
+
   @override
   void onInit() {
     super.onInit();

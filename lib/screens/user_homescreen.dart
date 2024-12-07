@@ -12,6 +12,7 @@ import 'package:wordpress/helpers/helper_functions.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/screens/auto_login.dart';
 import 'package:wordpress/screens/login.dart';
+import 'package:wordpress/widgets/custom_navbar_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   final String name;
@@ -113,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       // backgroundColor: const Color(0xFFFFFFFF),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
         title: Row(
           children: [
             // Text(settingsController.headerTitle.value),
@@ -141,7 +142,117 @@ class _HomeScreenState extends State<HomeScreen> {
             '0xff${settingsController.headerBgColor.value}',
           ),
         ),
-        // backgroundColor: Colors.pink,
+      ),
+      drawer: Drawer(
+        backgroundColor: settingsController.drawerBgColor.value.isEmpty
+            ? Colors.white
+            : Color(
+                int.parse(
+                  '0xff${settingsController.drawerBgColor.value}',
+                ),
+              ),
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 200, // Adjust the height as per your design
+              decoration: const BoxDecoration(
+                color: ColorPalette.primaryColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(50),
+                  bottomRight: Radius.circular(50),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: Image.asset('assets/joyuful-icon.png', height: 100),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: settingsController.navbarItems.length,
+                itemBuilder: (context, index) {
+                  print('This is the index: $index');
+                  print(
+                      'This is the length of the navbar items: ${settingsController.navbarItems.length}');
+                  if (index == (settingsController.navbarItems.length - 1)) {
+                    return GestureDetector(
+                      onTap: () async {
+                        await clearWebViewSessionsAndCookies();
+                        await SharedPreferencesHelper.clearAll();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginScreen(),
+                          ),
+                          (route) => false,
+                        );
+                        Get.snackbar('Logged Out', 'You have been logged out');
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        margin: EdgeInsets.symmetric(vertical: 4.h),
+                        padding: EdgeInsets.all(8.r),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(12.r),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: Offset(2, 4),
+                            )
+                          ],
+                        ),
+                        child: Row(
+                          // mainAxisSize: MainAxisSize.min,
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.logout,
+                              color: Color(
+                                int.parse(
+                                  "0xff${settingsController.navbarIconColor.value}",
+                                ),
+                              ),
+                              size: settingsController.navbarIconSize.value,
+                            ),
+                            SizedBox(width: 8.h),
+                            Text(
+                              'Logout',
+                              style: TextStyle(
+                                color: Color(int.parse(
+                                    "0xff${settingsController.navbarTextColor.value}")),
+                                fontSize:
+                                    settingsController.navbarTextSize.value,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  final link = settingsController.navbarItems[index + 1];
+                  return CustomDrawerButton(
+                    label: link.label,
+                    iconUrl: link.iconUrl,
+                    destination: link.destination,
+                    iconSize: settingsController.navbarIconSize.value,
+                    backgroundColor:
+                        settingsController.navbarBackgroundColor.value,
+                    textColor: settingsController.navbarTextColor.value,
+                    textSize: settingsController.navbarTextSize.value,
+                    iconColor: settingsController.navbarIconColor.value,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
 
       body: Column(
@@ -319,7 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           Expanded(
-            flex: settingsController.navBarFlexValue.value,
+            // flex: 1,
             child: Obx(() {
               if (settingsController.navBarLoading.value) {
                 return const Center(
@@ -330,228 +441,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 // height: screenHeight * 0.2,
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w)
-                        .copyWith(top: 8.w),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                          settingsController.navbarItems.length + 1, (index) {
-                        if (index == settingsController.navbarItems.length) {
-                          return GestureDetector(
-                            onTap: () async {
-                              await clearWebViewSessionsAndCookies();
-                              await SharedPreferencesHelper.clearAll();
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginScreen(),
-                                ),
-                                (route) => false,
-                              );
-                              Get.snackbar(
-                                  'Logged Out', 'You have been logged out');
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              margin: EdgeInsets.symmetric(
-                                  vertical:
-                                      4.h), // Vertical spacing between buttons
-                              padding: EdgeInsets.all(8.r),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(12.r),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 6,
-                                    offset: Offset(2, 4),
-                                  )
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.logout,
-                                    color: Color(
-                                      int.parse(
-                                        "0xff${settingsController.navbarIconColor.value}",
-                                      ),
-                                    ),
-                                    size:
-                                        settingsController.navbarIconSize.value,
-                                  ),
-                                  SizedBox(width: 8.h),
-                                  Text(
-                                    'Logout',
-                                    style: TextStyle(
-                                      color: Color(int.parse(
-                                          "0xff${settingsController.navbarTextColor.value}")),
-                                      fontSize: settingsController
-                                          .navbarTextSize.value,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
-
-                        final link = settingsController.navbarItems[index];
-                        return GestureDetector(
-                          onTap: () {
-                            // _loadUrl(link.destination);
-                            Get.to(() => AutoLoginPage(
-                                  email: widget.email,
-                                  password: widget.password,
-                                  firstTime: false,
-                                  otherUrl: link.destination,
-                                ));
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            margin: EdgeInsets.symmetric(vertical: 4.h),
-                            padding: EdgeInsets.all(8.r),
-                            decoration: BoxDecoration(
-                              color: Color(int.parse(
-                                  "0xff${settingsController.navbarBackgroundColor.value}")),
-                              borderRadius: BorderRadius.circular(12.r),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 6,
-                                  offset: Offset(2, 4),
-                                )
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.network(
-                                  link.iconUrl,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.error,
-                                      color: Color(
-                                        int.parse(
-                                          "0xff${settingsController.navbarIconColor.value}",
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  color: Color(
-                                    int.parse(
-                                      "0xff${settingsController.navbarIconColor.value}",
-                                    ),
-                                  ),
-                                  height:
-                                      settingsController.navbarIconSize.value,
-                                  width:
-                                      settingsController.navbarIconSize.value,
-                                ),
-                                SizedBox(width: 8.h),
-                                Text(
-                                  link.label,
-                                  style: TextStyle(
-                                    color: Color(int.parse(
-                                        "0xff${settingsController.navbarTextColor.value}")),
-                                    fontSize:
-                                        settingsController.navbarTextSize.value,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
+                      padding: EdgeInsets.symmetric(horizontal: 16.w)
+                          .copyWith(top: 8.w),
+                      child: CustomDrawerButton(
+                        label: settingsController.navbarItems.first.label,
+                        iconUrl: settingsController.navbarItems.first.iconUrl,
+                        destination:
+                            settingsController.navbarItems.first.destination,
+                        iconSize: settingsController.navbarIconSize.value,
+                        backgroundColor:
+                            settingsController.navbarBackgroundColor.value,
+                        textColor: settingsController.navbarTextColor.value,
+                        textSize: settingsController.navbarTextSize.value,
+                        iconColor: settingsController.navbarIconColor.value,
+                      )),
                 ),
               );
             }),
           ),
-
-          // Obx(() {
-          //   if (settingsController.navBarLoading.value) {
-          //     return const Center(
-          //       child: CircularProgressIndicator(),
-          //     );
-          //   }
-          //   return Expanded(
-          //     child: SizedBox(
-          //       height: 120.h,
-          //       child: Padding(
-          //         padding: EdgeInsets.symmetric(horizontal: 16.w),
-          //         child: Column(
-          //           mainAxisAlignment: MainAxisAlignment.center,
-          //           children: List.generate(
-          //               settingsController.navbarItems.length, (index) {
-          //             final link = settingsController.navbarItems[index];
-          //             return Expanded(
-          //               child: GestureDetector(
-          //                 onTap: () {
-          //                   _loadUrl(link.destination);
-          //                 },
-          //                 child: Container(
-          //                   margin: EdgeInsets.symmetric(horizontal: 4.w),
-          //                   padding: EdgeInsets.all(8.r),
-          //                   decoration: BoxDecoration(
-          //                     color: Color(int.parse(
-          //                         "0xff${settingsController.navbarBackgroundColor.value}")),
-          //                     borderRadius: BorderRadius.circular(12.r),
-          //                     boxShadow: const [
-          //                       BoxShadow(
-          //                         color: Colors.black26,
-          //                         blurRadius: 6,
-          //                         offset: Offset(2, 4),
-          //                       )
-          //                     ],
-          //                   ),
-          //                   child: Column(
-          //                     mainAxisAlignment: MainAxisAlignment.center,
-          //                     children: [
-          //                       Image.network(
-          //                         link.iconUrl,
-          //                         color: Color(
-          //                           int.parse(
-          //                             "0xff${settingsController.navbarIconColor.value}",
-          //                           ),
-          //                         ),
-          //                         height:
-          //                             settingsController.navbarIconSize.value,
-          //                         width:
-          //                             settingsController.navbarIconSize.value,
-          //                       ),
-          //                       SizedBox(height: 8.h),
-          //                       Text(
-          //                         link.label,
-          //                         style: TextStyle(
-          //                           color: Color(int.parse(
-          //                               "0xff${settingsController.navbarTextColor.value}")),
-          //                           fontSize:
-          //                               settingsController.navbarTextSize.value,
-          //                           fontWeight: FontWeight.w600,
-          //                         ),
-          //                         textAlign: TextAlign.center,
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 ),
-          //               ),
-          //             );
-          //           }),
-          //         ),
-          //       ),
-          //     ),
-          //   );
-          // }),
         ],
       ),
     );
