@@ -16,7 +16,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorPalette.primaryColor,
+      backgroundColor: ColorPalette.loginColor,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
@@ -25,19 +25,26 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
+                Image.asset(
+                  'assets/icon-login.png',
+                  height: 100,
+                ),
+
+
                 const Text(
-                  "Welcome Back!",
+                  "Welcome",
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 40,
                     fontWeight: FontWeight.w700,
                     color: ColorPalette.blackColor,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height:2),
                 Text(
                   "Login to your account",
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 22,
                     color: ColorPalette.blackColor.withOpacity(0.7),
                   ),
                 ),
@@ -45,13 +52,13 @@ class LoginScreen extends StatelessWidget {
                 TextFormField(
                   onChanged: (value) => _authController.username.value = value,
                   decoration: InputDecoration(
-                    hintText: "Email / Username",
+                    hintText: "Email",
                     prefixIcon: const Icon(Icons.email_outlined,
                         color: ColorPalette.blackColor),
                     filled: true,
                     fillColor: ColorPalette.whiteColor,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
@@ -77,7 +84,7 @@ class LoginScreen extends StatelessWidget {
                     return null;
                   },
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 10.h),
                 Obx(
                   () => TextFormField(
                     onChanged: (value) =>
@@ -103,7 +110,7 @@ class LoginScreen extends StatelessWidget {
                       filled: true,
                       fillColor: ColorPalette.whiteColor,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
@@ -136,10 +143,10 @@ class LoginScreen extends StatelessWidget {
                       backgroundColor: Color(int.parse(
                           '0xff${settingsController.signinButtonBackground.value}')),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 32),
+                          vertical: 10, horizontal: 20),
                       elevation: 6,
                     ),
                     child: _authController.isLoading.value
@@ -151,7 +158,7 @@ class LoginScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Color(int.parse(
                                   '0xff${settingsController.signinButtonTextColor.value}')),
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -178,7 +185,6 @@ class LoginScreen extends StatelessWidget {
                       color: ColorPalette.blackColor,
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
-                      fontStyle: FontStyle.italic,
                     ),
                   ),
                 ),

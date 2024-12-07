@@ -129,15 +129,10 @@ class _HomeScreenState extends State<HomeScreen> {
         // automaticallyImplyLeading: false,
         title: Row(
           children: [
-            // Text(settingsController.headerTitle.value),
-            Text("Welcome $name"),
 
-            const SizedBox(
-              width: 8,
-            ),
             if (settingsController.headerIcon.value.isEmpty)
               Image.asset(
-                'assets/joyuful-icon.png',
+                'assets/icon-menu.png',
                 height: 35,
                 width: 35,
               ),
@@ -147,6 +142,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 35,
                 width: 35,
               ),
+
+            const SizedBox(
+              width:10,
+            ),
+
+            // Text(settingsController.headerTitle.value),
+            Text("Welcome $name"),
+
           ],
         ),
         backgroundColor: Color(
@@ -167,18 +170,18 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               width: double.infinity,
-              height: 200, // Adjust the height as per your design
+              height: 150, // Adjust the height as per your design
               decoration: const BoxDecoration(
-                color: ColorPalette.primaryColor,
+                color: ColorPalette.splashColor,
                 borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(50),
-                  bottomRight: Radius.circular(50),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
                 ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Center(
-                  child: Image.asset('assets/joyuful-icon.png', height: 100),
+                  child: Image.asset('assets/icon-menu.png', height: 100),
                 ),
               ),
             ),
@@ -208,15 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         margin: EdgeInsets.symmetric(vertical: 4.h),
                         padding: EdgeInsets.all(8.r),
                         decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(12.r),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 6,
-                              offset: Offset(2, 4),
-                            )
-                          ],
+                          color: ColorPalette.logoutColor,
+                          borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Row(
                           // mainAxisSize: MainAxisSize.min,
@@ -298,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       return CarouselSlider(
                         options: CarouselOptions(
-                          height: MediaQuery.of(context).size.width * 1.4 / 3,
+                          height: MediaQuery.of(context).size.width * 1.7 / 3,
                           autoPlay: true,
                           enlargeCenterPage: true,
                           onPageChanged: (index, reason) {
@@ -320,9 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height:
                                       MediaQuery.of(context).size.width * 2 / 3,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: 16.w, vertical: 8.h),
+                                      horizontal: 16.w, vertical: 4.h),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16.r),
+                                    borderRadius: BorderRadius.circular(8.r),
                                     image: DecorationImage(
                                       image: NetworkImage(item.source),
                                       fit: BoxFit.cover,

@@ -148,22 +148,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         onPressed: () {
                                           Get.offAll(() => LoginScreen());
                                         },
-                                        icon: const Icon(Icons.arrow_forward,
-                                            color: ColorPalette.whiteColor),
+                                        // icon: const Icon(Icons.arrow_forward,
+                                            // color: ColorPalette.whiteColor),
                                         label: const Text(
                                           "Get Started",
                                           style: TextStyle(
-                                              color: ColorPalette.whiteColor,
+                                              color: ColorPalette.blackColor,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
-                                              ColorPalette.blackColor,
+                                              ColorPalette.primaryColor,
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(12)),
+                                                  BorderRadius.circular(8)),
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 24, vertical: 12),
+                                              horizontal: 22, vertical: 8),
                                         ),
                                       )
                                     : null,
@@ -183,8 +184,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 effect: const ExpandingDotsEffect(
                   activeDotColor: ColorPalette.indicatorActiveColor,
                   dotColor: ColorPalette.indicatorInactiveColor,
-                  dotHeight: 8,
-                  dotWidth: 8,
+                  dotHeight: 10,
+                  dotWidth: 10,
                 ),
               ),
             ),
@@ -206,18 +207,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 250),
+          const SizedBox(height: 50),
           Image.network(
             image,
-            height: 100,
-            width: 100,
+            height: 200,
+            width: 200,
             // color: ColorPalette.blackColor,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height:10),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
               color: ColorPalette.blackColor,
             ),
@@ -232,7 +233,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 30),
           if (widget != null) widget,
         ],
       ),
