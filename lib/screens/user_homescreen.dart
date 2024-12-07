@@ -8,9 +8,7 @@ import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:wordpress/colors.dart';
 import 'package:wordpress/controllers/settings_controller.dart';
-import 'package:wordpress/helpers/helper_functions.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
-import 'package:wordpress/screens/auto_login.dart';
 import 'package:wordpress/screens/login.dart';
 import 'package:wordpress/widgets/custom_navbar_widget.dart';
 
@@ -37,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late InAppWebViewController _webViewController;
   var currentUrl = "https://joyuful.com/login/".obs;
   final RxBool logoutLoading = false.obs;
+  final RxBool loading = false.obs;
 
   RxInt _currentPage = 0.obs;
   Future<void> clearWebViewSessionsAndCookies() async {
@@ -68,6 +67,19 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> getCookies() async {
+    String url =
+        'https://joyuful.com/login/'; // Replace with your website's URL
+
+    // Get cookies from the specific URL
+    List<Cookie> cookies = await CookieManager().getCookies(url: WebUri(url));
+
+    // Print cookies to debug
+    cookies.forEach((cookie) {
+      print('Cookie name: ${cookie.name}, Cookie value: ${cookie.value}');
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -79,19 +91,19 @@ class _HomeScreenState extends State<HomeScreen> {
     settingsController.fetchNavbarItems();
     settingsController.fetchHeroItems();
 
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.to(
-        () => AutoLoginPage(
-          email: widget.email,
-          password: widget.password,
-          firstTime: true,
-        ),
-      );
-    }).then((value) {
-      if (widget.fromSignIn) {
-        Get.snackbar('Welcome', 'Welcome $name');
-      }
-    });
+    // Future.delayed(const Duration(seconds: 1), () {
+    //   Get.to(
+    //     () => AutoLoginPage(
+    //       email: widget.email,
+    //       password: widget.password,
+    //       firstTime: true,
+    //     ),
+    //   );
+    // }).then((value) {
+    //   if (widget.fromSignIn) {
+    //     Get.snackbar('Welcome', 'Welcome $name');
+    //   }
+    // });
     if (widget.name == 'No name') {
       name = widget.email;
     } else {
@@ -352,77 +364,107 @@ class _HomeScreenState extends State<HomeScreen> {
               () => SizedBox(
                 child: GestureDetector(
                   onVerticalDragUpdate: (_) => true,
-                  child: InAppWebView(
-                    gestureRecognizers: Set()
-                      ..add(Factory<OneSequenceGestureRecognizer>(
-                          () => EagerGestureRecognizer())),
-                    initialUrlRequest: URLRequest(
-                      url:
-                          WebUri(settingsController.dashboardDestination.value),
-                    ),
-                    initialSettings: InAppWebViewSettings(
-                      javaScriptEnabled: true,
-                      domStorageEnabled: true,
-                      useShouldOverrideUrlLoading: true,
-                    ),
-                    shouldOverrideUrlLoading:
-                        (controller, shouldOverrideUrlLoadingRequest) async {
-                      print(
-                          'This is the URL: ${shouldOverrideUrlLoadingRequest.request.url}');
-                      if (shouldOverrideUrlLoadingRequest.request.url
-                          .toString()
-                          .contains(
-                              'https://joyuful.com/wp-login.php?action=logout')) {
-                        await SharedPreferencesHelper.clearAll();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ),
-                          (route) => false,
-                        );
-
-                        // Navigator.pop
-                        Get.snackbar('Logged Out', 'You have been logged out');
-                      }
-
-                      return NavigationActionPolicy.ALLOW;
-                    },
-                    onWebViewCreated: (controller) {
-                      _webViewController = controller;
-                      // Handle WebView controller creation if needed
-                    },
-                    onLoadStop: (controller, url) async {
-                      print("Page loaded: $url");
-
-                      if (url.toString().contains("wp-login.php") ||
-                          url
+                  child: Stack(
+                    children: [
+                      InAppWebView(
+                        gestureRecognizers: Set()
+                          ..add(Factory<OneSequenceGestureRecognizer>(
+                              () => EagerGestureRecognizer())),
+                        initialUrlRequest: URLRequest(
+                          url: WebUri(currentUrl.value),
+                          // settingsController.dashboardDestination.value),
+                        ),
+                        initialSettings: InAppWebViewSettings(
+                          javaScriptEnabled: true,
+                          domStorageEnabled: true,
+                          useShouldOverrideUrlLoading: true,
+                        ),
+                        shouldOverrideUrlLoading: (controller,
+                            shouldOverrideUrlLoadingRequest) async {
+                          print(
+                              'This is the URL: ${shouldOverrideUrlLoadingRequest.request.url}');
+                          if (shouldOverrideUrlLoadingRequest.request.url
                               .toString()
-                              .contains("https://joyuful.com/login/")) {
-                        await controller.evaluateJavascript(source: """
-                      (function() {
-                        // Check if the username field exists
-                        var usernameField = document.getElementById('user_login0');
-                        if (usernameField) {
-                          usernameField.value = '${widget.email}'; // Set email
-                        }
-                    
-                        // Check if the password field exists
-                        var passwordField = document.getElementById('user_pass0');
-                        if (passwordField) {
-                          passwordField.value = '${widget.password}'; // Set password
-                        }
-                    
-                        // Check if the submit button exists and click it
-                        var submitButton = document.getElementById('wp-submit0');
-                        if (submitButton) {
-                          submitButton.click(); // Click the login button
-                        }
-                      })();
-                    """);
-                      } else {}
-                    },
-                    onProgressChanged: (controller, progress) {},
+                              .contains(
+                                  'https://joyuful.com/wp-login.php?action=logout')) {
+                            await SharedPreferencesHelper.clearAll();
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(),
+                              ),
+                              (route) => false,
+                            );
+
+                            // Navigator.pop
+                            Get.snackbar(
+                                'Logged Out', 'You have been logged out');
+                          }
+
+                          return NavigationActionPolicy.ALLOW;
+                        },
+                        onWebViewCreated: (controller) async {
+                          _webViewController = controller;
+                        },
+                        onLoadStop: (controller, url) async {
+                          print("Page loaded: $url");
+
+                          if (url.toString().contains("wp-login.php") ||
+                              url
+                                  .toString()
+                                  .contains("https://joyuful.com/login/")) {
+                            await controller.evaluateJavascript(source: """
+                          (function() {
+                            // Check if the username field exists
+                            var usernameField = document.getElementById('user_login0');
+                            if (usernameField) {
+                              usernameField.value = '${widget.email}'; // Set email
+                            }
+                        
+                            // Check if the password field exists
+                            var passwordField = document.getElementById('user_pass0');
+                            if (passwordField) {
+                              passwordField.value = '${widget.password}'; // Set password
+                            }
+                        
+                            // Check if the submit button exists and click it
+                            var submitButton = document.getElementById('wp-submit0');
+                            if (submitButton) {
+                              submitButton.click(); // Click the login button
+                            }
+                          })();
+                        """);
+                          } else {
+                            loading.value = false;
+                            _loadUrl(
+                                settingsController.dashboardDestination.value);
+                          }
+                        },
+                        onProgressChanged: (controller, progress) {},
+                      ),
+                      Positioned.fill(
+                        child: Obx(
+                          () {
+                            if (loading.value == false) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return Container(
+                              height: double.infinity,
+                              width: double.infinity,
+                              color: Colors.white,
+                              child: const Center(
+                                child: SizedBox(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.yellow,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

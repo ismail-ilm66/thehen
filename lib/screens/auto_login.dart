@@ -89,17 +89,6 @@ class AutoLoginPage extends StatelessWidget {
 
               if (url.toString().contains("wp-login.php") ||
                   url.toString().contains("https://joyuful.com/login/")) {
-                // Inject JavaScript to fill the form and submit it
-                // await controller.evaluateJavascript(source: """
-                //   (function() {
-                //     // Fill the username and password fields
-                //     document.getElementById('user_login0').value = '$email'; // Set email
-                //     document.getElementById('user_pass0').value = '$password'; // Set password
-
-                //     // Automatically submit the form
-                //     document.getElementById('wp-submit0').click(); // Click the login button
-                //   })();
-                // """);
                 await controller.evaluateJavascript(source: """
   (function() {
     // Check if the username field exists
