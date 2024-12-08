@@ -50,11 +50,7 @@ class CustomDrawerButton extends StatelessWidget {
         padding: EdgeInsets.all(8.r),
         decoration: BoxDecoration(
           color: Color(int.parse('0xff$backgroundColor')),
-          borderRadius: BorderRadius.circular(12.r),
-          boxShadow: const [
-            BoxShadow(
-                color: Colors.black26, blurRadius: 6, offset: Offset(2, 4))
-          ],
+          borderRadius: BorderRadius.circular(6.r),
         ),
         child: Row(
           // mainAxisAlignment: MainAxisAlignment.center,
