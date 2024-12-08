@@ -110,7 +110,7 @@ class AutoLoginPage extends StatelessWidget {
     }
   })();
 """);
-                Future.delayed(Duration(seconds: 5), () {
+                Future.delayed(const Duration(seconds: 10), () {
                   Navigator.pop(context);
                 });
               } else {

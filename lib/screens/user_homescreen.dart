@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late InAppWebViewController _webViewController;
   var currentUrl = "https://joyuful.com/login/".obs;
   final RxBool logoutLoading = false.obs;
-  final RxBool loading = false.obs;
+  final RxBool loading = true.obs;
 
   RxInt _currentPage = 0.obs;
   Future<void> clearWebViewSessionsAndCookies() async {
@@ -405,6 +405,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         onWebViewCreated: (controller) async {
                           _webViewController = controller;
+                          _webViewController.addJavaScriptHandler(
+                              handlerName: 'onLoginSuccess',
+                              callback: (args) {
+                                print('Login Success: ${args[0]}');
+                                Future.delayed(const Duration(seconds: 5), () {
+                                  loading.value = false;
+                                  if (kDebugMode) {
+                                    print(
+                                        'This is the dashboard destination: ${settingsController.dashboardDestination.value}');
+                                  }
+                                  _loadUrl(
+                                    settingsController
+                                        .dashboardDestination.value,
+                                  );
+                                });
+                                // loading.value = false;
+                              });
                         },
                         onLoadStop: (controller, url) async {
                           print("Page loaded: $url");
@@ -413,31 +430,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               url
                                   .toString()
                                   .contains("https://joyuful.com/login/")) {
+                            // Inject the JavaScript to fill in the login form
                             await controller.evaluateJavascript(source: """
-                          (function() {
-                            // Check if the username field exists
-                            var usernameField = document.getElementById('user_login0');
-                            if (usernameField) {
-                              usernameField.value = '${widget.email}'; // Set email
-                            }
-                        
-                            // Check if the password field exists
-                            var passwordField = document.getElementById('user_pass0');
-                            if (passwordField) {
-                              passwordField.value = '${widget.password}'; // Set password
-                            }
-                        
-                            // Check if the submit button exists and click it
-                            var submitButton = document.getElementById('wp-submit0');
-                            if (submitButton) {
-                              submitButton.click(); // Click the login button
-                            }
-                          })();
-                        """);
+      (function() {
+        // Check if the username field exists
+        var usernameField = document.getElementById('user_login0');
+        if (usernameField) {
+          usernameField.value = '${widget.email}'; // Set the email
+        }
+
+        // Check if the password field exists
+        var passwordField = document.getElementById('user_pass0');
+        if (passwordField) {
+          passwordField.value = '${widget.password}'; // Set the password
+        }
+
+        // Check if the submit button exists and click it
+        var submitButton = document.getElementById('wp-submit0');
+        if (submitButton) {
+          submitButton.click(); // Click the login button
+        }
+
+        // Once the page is loaded, send the callback to Flutter
+        var checkLoginRedirect = function() {
+          window.flutter_inappwebview.callHandler('onLoginSuccess', 'Logged in and redirected');
+        };
+
+        // Start checking for the redirect after submitting the form
+        setTimeout(checkLoginRedirect, 3000);  // Wait for 3 seconds (adjust time if needed)
+      })();
+    """);
                           } else {
                             loading.value = false;
-                            _loadUrl(
-                                settingsController.dashboardDestination.value);
+                            // _loadUrl(
+                            //     settingsController.dashboardDestination.value);
                           }
                         },
                         onProgressChanged: (controller, progress) {},
