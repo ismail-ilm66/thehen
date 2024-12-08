@@ -9,6 +9,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:wordpress/colors.dart';
 import 'package:wordpress/controllers/settings_controller.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
+import 'package:wordpress/screens/auto_login.dart';
 import 'package:wordpress/screens/login.dart';
 import 'package:wordpress/widgets/custom_navbar_widget.dart';
 
@@ -129,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen> {
         // automaticallyImplyLeading: false,
         title: Row(
           children: [
-
             if (settingsController.headerIcon.value.isEmpty)
               Image.asset(
                 'assets/icon-menu.png',
@@ -144,12 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
             const SizedBox(
-              width:10,
+              width: 10,
             ),
 
             // Text(settingsController.headerTitle.value),
             Text("Welcome $name"),
-
           ],
         ),
         backgroundColor: Color(
@@ -166,100 +165,168 @@ class _HomeScreenState extends State<HomeScreen> {
                   '0xff${settingsController.drawerBgColor.value}',
                 ),
               ),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 150, // Adjust the height as per your design
-              decoration: const BoxDecoration(
-                color: ColorPalette.splashColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 150, // Adjust the height as per your design
+                decoration: const BoxDecoration(
+                  color: ColorPalette.splashColor,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: Image.asset('assets/icon-menu.png', height: 100),
+                  ),
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: Image.asset('assets/icon-menu.png', height: 100),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: settingsController.navbarItems.length,
-                itemBuilder: (context, index) {
-                  print('This is the index: $index');
-                  print(
-                      'This is the length of the navbar items: ${settingsController.navbarItems.length}');
-                  if (index == (settingsController.navbarItems.length - 1)) {
-                    return GestureDetector(
-                      onTap: () async {
-                        await clearWebViewSessionsAndCookies();
-                        await SharedPreferencesHelper.clearAll();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
-                          ),
-                          (route) => false,
-                        );
-                        Get.snackbar('Logged Out', 'You have been logged out');
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.symmetric(vertical: 4.h),
-                        padding: EdgeInsets.all(8.r),
-                        decoration: BoxDecoration(
-                          color: ColorPalette.logoutColor,
-                          borderRadius: BorderRadius.circular(6.r),
-                        ),
-                        child: Row(
-                          // mainAxisSize: MainAxisSize.min,
-                          // mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.logout,
-                              color: Color(
-                                int.parse(
-                                  "0xff${settingsController.navbarIconColor.value}",
-                                ),
-                              ),
-                              size: settingsController.navbarIconSize.value,
-                            ),
-                            SizedBox(width: 8.h),
-                            Text(
-                              'Logout',
-                              style: TextStyle(
-                                color: Color(int.parse(
-                                    "0xff${settingsController.navbarTextColor.value}")),
-                                fontSize:
-                                    settingsController.navbarTextSize.value,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: settingsController.navbarItems.length - 1,
+                  itemBuilder: (context, index) {
+                    print('This is the index: $index');
+                    print(
+                        'This is the length of the navbar items: ${settingsController.navbarItems.length}');
+                    // if (index == (settingsController.navbarItems.length - 1)) {
+                    //   return GestureDetector(
+                    //     onTap: () async {
+                    //       await clearWebViewSessionsAndCookies();
+                    //       await SharedPreferencesHelper.clearAll();
+                    //       Navigator.pushAndRemoveUntil(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //           builder: (context) => LoginScreen(),
+                    //         ),
+                    //         (route) => false,
+                    //       );
+                    //       Get.snackbar(
+                    //           'Logged Out', 'You have been logged out');
+                    //     },
+                    //     child: Container(
+                    //       width: double.infinity,
+                    //       margin: EdgeInsets.symmetric(vertical: 4.h),
+                    //       padding: EdgeInsets.all(8.r),
+                    //       decoration: BoxDecoration(
+                    //         color: ColorPalette.logoutColor,
+                    //         borderRadius: BorderRadius.circular(6.r),
+                    //       ),
+                    //       child: Row(
+                    //         // mainAxisSize: MainAxisSize.min,
+                    //         // mainAxisAlignment: MainAxisAlignment.center,
+                    //         children: [
+                    //           Icon(
+                    //             Icons.logout,
+                    //             color: Color(
+                    //               int.parse(
+                    //                 "0xff${settingsController.navbarIconColor.value}",
+                    //               ),
+                    //             ),
+                    //             size: settingsController.navbarIconSize.value,
+                    //           ),
+                    //           SizedBox(width: 8.h),
+                    //           Text(
+                    //             'Logout',
+                    //             style: TextStyle(
+                    //               color: Color(int.parse(
+                    //                   "0xff${settingsController.navbarTextColor.value}")),
+                    //               fontSize:
+                    //                   settingsController.navbarTextSize.value,
+                    //               fontWeight: FontWeight.w600,
+                    //             ),
+                    //             textAlign: TextAlign.center,
+                    //           ),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   );
+                    // }
+                    final link = settingsController.navbarItems[index + 1];
+                    return CustomDrawerButton(
+                      label: link.label,
+                      iconUrl: link.iconUrl,
+                      destination: link.destination,
+                      iconSize: settingsController.navbarIconSize.value,
+                      backgroundColor:
+                          settingsController.navbarBackgroundColor.value,
+                      textColor: settingsController.navbarTextColor.value,
+                      textSize: settingsController.navbarTextSize.value,
+                      iconColor: settingsController.navbarIconColor.value,
                     );
-                  }
-                  final link = settingsController.navbarItems[index + 1];
-                  return CustomDrawerButton(
-                    label: link.label,
-                    iconUrl: link.iconUrl,
-                    destination: link.destination,
-                    iconSize: settingsController.navbarIconSize.value,
-                    backgroundColor:
-                        settingsController.navbarBackgroundColor.value,
-                    textColor: settingsController.navbarTextColor.value,
-                    textSize: settingsController.navbarTextSize.value,
-                    iconColor: settingsController.navbarIconColor.value,
-                  );
-                },
+                  },
+                ),
               ),
-            ),
-          ],
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'You are Logged in as $name',
+                  style: TextStyle(
+                    color: Color(
+                      int.parse(
+                        '0xff${settingsController.navbarTextColor.value}',
+                      ),
+                    ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await clearWebViewSessionsAndCookies();
+                  await SharedPreferencesHelper.clearAll();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+                  Get.snackbar('Logged Out', 'You have been logged out');
+                },
+                child: Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.symmetric(vertical: 4.h),
+                  padding: EdgeInsets.all(8.r),
+                  decoration: BoxDecoration(
+                    // color: ColorPalette.logoutColor,
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Row(
+                    // mainAxisSize: MainAxisSize.min,
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        color: Color(
+                          int.parse(
+                            "0xff${settingsController.navbarIconColor.value}",
+                          ),
+                        ),
+                        size: settingsController.navbarIconSize.value,
+                      ),
+                      SizedBox(width: 8.h),
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Color(int.parse(
+                              "0xff${settingsController.navbarTextColor.value}")),
+                          fontSize: settingsController.navbarTextSize.value,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
 
@@ -308,7 +375,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             builder: (BuildContext context) {
                               return GestureDetector(
                                 onTap: () {
-                                  _loadUrl(item.destination);
+                                  Get.to(
+                                    () => AutoLoginPage(
+                                      email: widget.email,
+                                      password: widget.password,
+                                      otherUrl: item.destination,
+                                      firstTime: false,
+                                    ),
+                                  );
                                 },
                                 child: Container(
                                   width:
@@ -513,8 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         destination:
                             settingsController.navbarItems.first.destination,
                         iconSize: settingsController.navbarIconSize.value,
-                        backgroundColor:
-                            settingsController.navbarBackgroundColor.value,
+                        backgroundColor: 'ffc200',
                         textColor: settingsController.navbarTextColor.value,
                         textSize: settingsController.navbarTextSize.value,
                         iconColor: settingsController.navbarIconColor.value,

@@ -38,7 +38,31 @@ class AutoLoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(settingsController.headerTitle.value),
+        title: Row(
+          children: [
+            if (settingsController.headerIcon.value.isEmpty)
+              Image.asset(
+                'assets/icon-menu.png',
+                height: 35,
+                width: 35,
+              ),
+            if (settingsController.headerIcon.value.isNotEmpty)
+              Image.network(
+                settingsController.headerIcon.value,
+                height: 35,
+                width: 35,
+              ),
+
+            const SizedBox(
+              width: 10,
+            ),
+
+            // Text(settingsController.headerTitle.value),
+            Text(settingsController.headerTitle.value),
+          ],
+        ),
+
+        // title: Text(settingsController.headerTitle.value),
         backgroundColor:
             Color(int.parse('0xff${settingsController.headerBgColor.value}')),
       ),
