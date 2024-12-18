@@ -11,7 +11,7 @@ class RegisterItem {
   factory RegisterItem.fromMap(Map<String, dynamic> map) {
     return RegisterItem(
       registerDestination:
-          map['register_destination'] ?? 'https://joyuful.com/registration/',
+          map['register_destination'] ?? 'https://thehen.io/registration/',
       registerText:
           map['register_text'] ?? 'Not registered yet? Click here to register',
     );

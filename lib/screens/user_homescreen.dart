@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final SettingsController settingsController = Get.find();
   String name = '';
   late InAppWebViewController _webViewController;
-  var currentUrl = "https://joyuful.com/login/".obs;
+  var currentUrl = "https://thehen.io/access/".obs;
   final RxBool logoutLoading = false.obs;
   final RxBool loading = true.obs;
 
@@ -69,8 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> getCookies() async {
-    String url =
-        'https://joyuful.com/login/'; // Replace with your website's URL
+    String url = 'https://thehen.io/access/'; // Replace with your website's URL
 
     // Get cookies from the specific URL
     List<Cookie> cookies = await CookieManager().getCookies(url: WebUri(url));
@@ -454,9 +453,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           print(
                               'This is the URL: ${shouldOverrideUrlLoadingRequest.request.url}');
                           if (shouldOverrideUrlLoadingRequest.request.url
-                              .toString()
-                              .contains(
-                                  'https://joyuful.com/wp-login.php?action=logout')) {
+                                  .toString()
+                                  .contains(
+                                      'https://thehen.io/mfa?action=logout') ||
+                              shouldOverrideUrlLoadingRequest.request.url
+                                  .toString()
+                                  .contains('action=logout')) {
                             await SharedPreferencesHelper.clearAll();
                             Navigator.pushAndRemoveUntil(
                               context,
@@ -499,7 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (url.toString().contains("wp-login.php") ||
                               url
                                   .toString()
-                                  .contains("https://joyuful.com/login/")) {
+                                  .contains("https://thehen.io/access/")) {
                             // Inject the JavaScript to fill in the login form
                             await controller.evaluateJavascript(source: """
       (function() {

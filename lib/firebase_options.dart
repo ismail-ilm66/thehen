@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC1G12_mkI9XvHpFFo-6jLrHhGi4hySr3A',
-    appId: '1:46106613533:android:31aa3ba4a87f3ed3aeb3f4',
-    messagingSenderId: '46106613533',
-    projectId: 'joyufulapp',
-    storageBucket: 'joyufulapp.firebasestorage.app',
+    apiKey: 'AIzaSyDc1aGSRpNvdpAeu_wWHGAGO4QozNGwukw',
+    appId: '1:1000950432361:android:019698e7f03329c36898f8',
+    messagingSenderId: '1000950432361',
+    projectId: 'apphen-22',
+    storageBucket: 'apphen-22.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyALnk1-7Cq14-fD4TJJCQ0HSqKeMz-cyfg',
-    appId: '1:46106613533:ios:9ff43f816d4ff16faeb3f4',
-    messagingSenderId: '46106613533',
-    projectId: 'joyufulapp',
-    storageBucket: 'joyufulapp.firebasestorage.app',
-    iosBundleId: 'com.wordpress.joyuful',
+    apiKey: 'AIzaSyCUyI3fN77PduG0UnUeZKzeIcPxGjnYq00',
+    appId: '1:1000950432361:ios:0fbee2b43e8757456898f8',
+    messagingSenderId: '1000950432361',
+    projectId: 'apphen-22',
+    storageBucket: 'apphen-22.firebasestorage.app',
+    iosBundleId: 'com.thehen.io',
   );
 
 }

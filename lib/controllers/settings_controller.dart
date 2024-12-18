@@ -45,7 +45,7 @@ class SettingsController extends GetxController {
   // Theme Settings
   final RxString headerBgColor = "000000".obs;
   final RxString headerIcon = "".obs;
-  final RxString headerTitle = "Joyuful".obs;
+  final RxString headerTitle = "TheHen".obs;
   final RxString gradientBegin = "Alignment.center".obs;
   final RxString gradientEnd = "Alignment.center".obs;
   final RxString gradientType = "None".obs;
@@ -195,7 +195,7 @@ class SettingsController extends GetxController {
     try {
       loadingOnboardingItems.value = true;
       DocumentSnapshot onboardingDoc =
-          await _firestore.collection('app_config').doc('Registration').get();
+          await _firestore.collection('app_config').doc('signin').get();
 
       if (onboardingDoc.exists) {
         Map<String, dynamic> data =
@@ -219,7 +219,7 @@ class SettingsController extends GetxController {
         //   ..sort((a, b) => a.order.compareTo(b.order));
       } else {
         registerItems.add(RegisterItem(
-            registerDestination: 'https://joyuful.com/registration/',
+            registerDestination: 'https://thehen.io/registration/',
             registerText: 'Not registered yet? Click here to register'));
         print("No signup items found in Firestore.");
       }

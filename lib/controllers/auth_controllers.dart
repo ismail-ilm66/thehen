@@ -10,7 +10,6 @@ import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/models/login_model.dart';
 import 'package:wordpress/screens/user_homescreen.dart';
 
-import '../admin_dashboard.dart';
 import '../colors.dart';
 
 class AuthController extends GetxController {
@@ -24,7 +23,7 @@ class AuthController extends GetxController {
   final tokenResponse = Rxn<TokenResponse>();
   final errorMessage = ''.obs;
 
-  final String apiUrl = "https://joyuful.com/wp-json/jwt-auth/v1/token";
+  final String apiUrl = "https://thehen.io/wp-json/jwt-auth/v1/token";
   final SettingsController settingsController = Get.find();
 
   void _showSnackbar(
@@ -33,11 +32,11 @@ class AuthController extends GetxController {
       SnackBar(
         content: Text(
           message,
-          style: TextStyle(color: ColorPalette.whiteColor),
+          style: const TextStyle(color: ColorPalette.whiteColor),
         ),
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.all(16.0),
+        margin: const EdgeInsets.all(16.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
@@ -96,15 +95,12 @@ class AuthController extends GetxController {
       tokenResponse.value = TokenResponse.fromJson(responseData);
 
       if (tokenResponse.value?.token != null) {
-        // Success response
-        // Get.to(() => WebViewScreen(token: tokenResponse.value!.token!));
         await saveTokenToFirestore(username.value);
         name.value = tokenResponse.value!.userDisplayName ?? 'No name';
         await SharedPreferencesHelper.setEmail(username.value);
         await SharedPreferencesHelper.setPassword(password.value);
         await SharedPreferencesHelper.setName(name.value);
-        // Get.to(() =>
-        //     AutoLoginPage(email: username.value, password: password.value));
+
         Get.offAll(
           () => HomeScreen(
             name: name.value,
@@ -126,7 +122,7 @@ class AuthController extends GetxController {
       errorMessage.value = "An unexpected error occurred: $e";
       Get.snackbar("Error", errorMessage.value);
     } finally {
-      isLoading.value = false; // Hide loading spinner
+      isLoading.value = false;
     }
   }
 

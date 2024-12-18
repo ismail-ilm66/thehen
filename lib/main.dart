@@ -11,8 +11,7 @@ import 'package:wordpress/screens/splash.dart';
 import 'colors.dart';
 import 'notification_service.dart';
 
-
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Joyuful',
+        title: 'TheHEN',
         theme: ThemeData(
           useMaterial3: true,
           scaffoldBackgroundColor: Colors.white,

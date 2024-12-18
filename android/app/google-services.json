@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "46106613533",
-    "project_id": "joyufulapp",
-    "storage_bucket": "joyufulapp.firebasestorage.app"
+    "project_number": "1000950432361",
+    "project_id": "apphen-22",
+    "storage_bucket": "apphen-22.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:46106613533:android:31aa3ba4a87f3ed3aeb3f4",
+        "mobilesdk_app_id": "1:1000950432361:android:019698e7f03329c36898f8",
         "android_client_info": {
-          "package_name": "com.wordpress.joyuful"
+          "package_name": "com.thehen.io"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC1G12_mkI9XvHpFFo-6jLrHhGi4hySr3A"
+          "current_key": "AIzaSyDc1aGSRpNvdpAeu_wWHGAGO4QozNGwukw"
         }
       ],
       "services": {

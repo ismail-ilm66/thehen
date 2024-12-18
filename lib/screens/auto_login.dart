@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wordpress/colors.dart';
 import 'package:wordpress/controllers/settings_controller.dart';
 import 'package:wordpress/controllers/web_controller.dart';
-import 'package:wordpress/helpers/helper_functions.dart';
 import 'package:wordpress/helpers/shared_preferences_helper.dart';
 import 'package:wordpress/screens/login.dart';
 
 class AutoLoginPage extends StatelessWidget {
-  final String email; // User email for login
-  final String password; // User password for login
+  final String email;
+  final String password;
   final String? otherUrl;
   final bool firstTime;
 
@@ -27,11 +25,32 @@ class AutoLoginPage extends StatelessWidget {
       Get.put(WebViewController()); // Instantiate the controller
 
   final SettingsController settingsController = Get.find();
+  late InAppWebViewController _webViewController;
 
-  Future<int> getCookiesCountForUrl(String url) async {
-    final cookies = await CookieManager.instance().getCookies(url: WebUri(url));
-    print("Cookies for $url: ${cookies.length}");
-    return cookies.length;
+  Future<void> clearWebViewSessionsAndCookies() async {
+    try {
+      // Clear all cookies
+      final cookieManager = CookieManager.instance();
+      await cookieManager.deleteAllCookies();
+      print("All cookies have been cleared.");
+
+      // Clear cache and session storage
+      if (_webViewController != null) {
+        await _webViewController.clearCache();
+        print("WebView cache cleared.");
+
+        // Clear session storage via JavaScript
+        await _webViewController.evaluateJavascript(source: """
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+      """);
+        print("LocalStorage and SessionStorage cleared.");
+      } else {
+        print("WebViewController is not initialized.");
+      }
+    } catch (e) {
+      print("Error clearing sessions and cookies: $e");
+    } finally {}
   }
 
   @override
@@ -70,7 +89,7 @@ class AutoLoginPage extends StatelessWidget {
         children: [
           InAppWebView(
             initialUrlRequest: URLRequest(
-              url: WebUri(otherUrl ?? "https://joyuful.com/login/"),
+              url: WebUri(otherUrl ?? "https://thehen.io/access/"),
             ),
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
@@ -82,9 +101,13 @@ class AutoLoginPage extends StatelessWidget {
               print(
                   'This is the URL: ${shouldOverrideUrlLoadingRequest.request.url}');
               if (shouldOverrideUrlLoadingRequest.request.url
-                  .toString()
-                  .contains('https://joyuful.com/wp-login.php?action=logout')) {
+                      .toString()
+                      .contains('https://thehen.io/mfa?action=logout') ||
+                  shouldOverrideUrlLoadingRequest.request.url
+                      .toString()
+                      .contains('action=logout')) {
                 await SharedPreferencesHelper.clearAll();
+                await clearWebViewSessionsAndCookies();
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
@@ -97,22 +120,24 @@ class AutoLoginPage extends StatelessWidget {
                 Get.snackbar('Logged Out', 'You have been logged out');
               }
               if (firstTime) {
-                if (shouldOverrideUrlLoadingRequest.request.url
-                    .toString()
-                    .contains("https://joyuful.com/entry/")) {
-                  Navigator.pop(context);
-                }
+                // if (shouldOverrideUrlLoadingRequest.request.url
+                //     .toString()
+                //     .contains("https://joyuful.com/entry/")) {
+                //   Navigator.pop(context);
+                // }
               }
               return NavigationActionPolicy.ALLOW;
             },
             onWebViewCreated: (controller) {
+              _webViewController = controller;
+
               // Handle WebView controller creation if needed
             },
             onLoadStop: (controller, url) async {
               print("Page loaded: $url");
 
               if (url.toString().contains("wp-login.php") ||
-                  url.toString().contains("https://joyuful.com/login/")) {
+                  url.toString().contains("https://thehen.io/access/")) {
                 await controller.evaluateJavascript(source: """
   (function() {
     // Check if the username field exists
