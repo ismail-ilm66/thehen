@@ -12,9 +12,15 @@ class HeroItem {
   });
 
   factory HeroItem.fromMap(Map<String, dynamic> data) {
+    print('This is the data: $data in the json of the hero item');
+    print('This is the enabled: ${data['_enabled'].runtimeType}');
+    print('This is the order: ${data['_order'].runtimeType}');
+    print('This is the destination: ${data['hero_destination'].runtimeType}');
+    print('This is the source: ${data['hero_source'].runtimeType}');
+
     return HeroItem(
       enabled: data['_enabled'] ?? false,
-      order: int.tryParse(data['_order'] ?? '0') ?? 0,
+      order: data['_order'] ?? 0,
       destination: data['hero_destination'] ?? 'www.google.com',
       source: data['hero_source'] ?? '',
     );

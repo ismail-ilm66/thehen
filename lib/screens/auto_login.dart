@@ -12,6 +12,7 @@ class AutoLoginPage extends StatelessWidget {
   final String password;
   final String? otherUrl;
   final bool firstTime;
+  final bool fromSignUp;
 
   AutoLoginPage({
     super.key,
@@ -19,6 +20,7 @@ class AutoLoginPage extends StatelessWidget {
     required this.password,
     this.otherUrl,
     this.firstTime = false,
+    this.fromSignUp = false,
   });
 
   final WebViewController webViewController =
@@ -135,6 +137,16 @@ class AutoLoginPage extends StatelessWidget {
             },
             onLoadStop: (controller, url) async {
               print("Page loaded: $url");
+              if (fromSignUp) {
+                if (url.toString().contains("wp-login.php") ||
+                    url.toString().contains("https://thehen.io/access/")) {
+                  Get.back();
+                  Get.snackbar(
+                    'Sign In',
+                    'Please Fill The Details To Sign In',
+                  );
+                }
+              }
 
               if (url.toString().contains("wp-login.php") ||
                   url.toString().contains("https://thehen.io/access/")) {

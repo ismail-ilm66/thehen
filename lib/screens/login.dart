@@ -25,12 +25,10 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 Image.asset(
                   'assets/icon-login.png',
                   height: 100,
                 ),
-
 
                 const Text(
                   "Welcome",
@@ -40,7 +38,7 @@ class LoginScreen extends StatelessWidget {
                     color: ColorPalette.blackColor,
                   ),
                 ),
-                const SizedBox(height:2),
+                const SizedBox(height: 2),
                 Text(
                   "Login to your account",
                   style: TextStyle(
@@ -175,6 +173,7 @@ class LoginScreen extends StatelessWidget {
                         otherUrl: settingsController
                             .registerItems.first.registerDestination,
                         firstTime: false,
+                        fromSignUp: true,
                       ),
                     );
                   },
