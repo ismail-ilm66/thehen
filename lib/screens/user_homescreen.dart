@@ -529,7 +529,7 @@ class _HomeScreenState extends State<HomeScreen> {
         };
 
         // Start checking for the redirect after submitting the form
-        setTimeout(checkLoginRedirect, 3000);  // Wait for 3 seconds (adjust time if needed)
+        setTimeout(checkLoginRedirect, 5000);  // Wait for 3 seconds (adjust time if needed)
       })();
     """);
                           } else {
