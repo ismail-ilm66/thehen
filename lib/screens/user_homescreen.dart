@@ -502,40 +502,32 @@ class _HomeScreenState extends State<HomeScreen> {
                               url
                                   .toString()
                                   .contains("https://thehen.io/access/")) {
-                            // Inject the JavaScript to fill in the login form
                             await controller.evaluateJavascript(source: """
       (function() {
-        // Check if the username field exists
         var usernameField = document.getElementById('user_login0');
         if (usernameField) {
           usernameField.value = '${widget.email}'; // Set the email
         }
 
-        // Check if the password field exists
         var passwordField = document.getElementById('user_pass0');
         if (passwordField) {
           passwordField.value = '${widget.password}'; // Set the password
         }
 
-        // Check if the submit button exists and click it
         var submitButton = document.getElementById('wp-submit0');
         if (submitButton) {
           submitButton.click(); // Click the login button
         }
 
-        // Once the page is loaded, send the callback to Flutter
         var checkLoginRedirect = function() {
           window.flutter_inappwebview.callHandler('onLoginSuccess', 'Logged in and redirected');
         };
 
-        // Start checking for the redirect after submitting the form
         setTimeout(checkLoginRedirect, 5000);  // Wait for 3 seconds (adjust time if needed)
       })();
     """);
                           } else {
                             loading.value = false;
-                            // _loadUrl(
-                            //     settingsController.dashboardDestination.value);
                           }
                         },
                         onProgressChanged: (controller, progress) {},
